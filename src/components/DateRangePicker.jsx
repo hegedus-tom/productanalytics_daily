@@ -47,7 +47,7 @@ function nextM(ym) {
 }
 
 /* ─── component ─── */
-export default function DateRangePicker({ onApply }) {
+export default function DateRangePicker({ onApply, forcedPeriod }) {
   const init = presetDates('7D')
   const [open,        setOpen]       = useState(false)
   const [applied,     setApplied]    = useState({ preset: '7D', start: init.start, end: init.end })
@@ -55,9 +55,20 @@ export default function DateRangePicker({ onApply }) {
   const [tStart,      setTStart]     = useState(init.start)
   const [tEnd,        setTEnd]       = useState(init.end)
   const [hover,       setHover]      = useState(null)
-  const [awaiting,    setAwaiting]   = useState(false)  // waiting for end-click
+  const [awaiting,    setAwaiting]   = useState(false)
   const [leftM,       setLeftM]      = useState({ year: 2026, month: 2 })
   const ref = useRef(null)
+
+  // Reflect a period loaded from a saved view
+  useEffect(() => {
+    if (!forcedPeriod) return
+    if (forcedPeriod.isCustom && forcedPeriod.start && forcedPeriod.end) {
+      setApplied({ preset: null, start: new Date(forcedPeriod.start), end: new Date(forcedPeriod.end) })
+    } else if (forcedPeriod.key) {
+      const r = presetDates(forcedPeriod.key)
+      setApplied({ preset: forcedPeriod.key, start: r.start, end: r.end })
+    }
+  }, [forcedPeriod])
 
   const rightM = nextM(leftM)
 
@@ -98,10 +109,11 @@ export default function DateRangePicker({ onApply }) {
 
   function apply() {
     if (!tStart || !tEnd) return
+    const isCustom = !preset
     const days = daysBetween(tStart, tEnd)
-    const pk   = preset || (days <= 7 ? '7D' : '30D')
-    setApplied({ preset: pk, start: tStart, end: tEnd })
-    onApply?.(pk, tStart, tEnd)
+    const pk   = preset || (days <= 7 ? '7D' : days <= 14 ? '14D' : '30D')
+    setApplied({ preset: isCustom ? null : pk, start: tStart, end: tEnd })
+    onApply?.(isCustom ? 'custom' : pk, tStart, tEnd)
     setOpen(false)
   }
 

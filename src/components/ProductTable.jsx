@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { productList, segments } from '../data/mockData'
+import { segments, getProductListForPeriod, getOverviewForPeriod } from '../data/mockData'
 import FilterBar from './FilterBar'
 import ProductModal from './ProductModal'
 import SaveViewModal from './SaveViewModal'
@@ -16,14 +16,6 @@ const TABS = [
   { key: 'inactive',       label: 'Inactive products',count: segments.inactive,        alert: false },
 ]
 
-const OVERVIEW = {
-  all:            { products: segments.total,           spend: 15395.20, revenue: 32441.78, roas: 210.73 },
-  losers:         { products: segments.losers,          spend:  4155.14, revenue:   482.00, roas:  11.60 },
-  underperformers:{ products: segments.underperformers, spend:  5904.87, revenue:  3146.34, roas:  53.25 },
-  budgetSpenders: { products: segments.budgetSpenders,  spend:  1583.41, revenue:  4202.40, roas: 265.40 },
-  active:         { products: segments.active,          spend: 10499.06, revenue: 22152.16, roas: 211.00 },
-  inactive:       { products: segments.inactive,        spend:      0,   revenue:      0,   roas:   null },
-}
 
 const TAB_ALERT = {
   losers: {
@@ -105,7 +97,7 @@ function SortArrow({ col, sortCol, sortDir }) {
   )
 }
 
-export default function ProductTable({ activeTab: externalTab, onTabChange, onSaveView, externalFilters }) {
+export default function ProductTable({ activeTab: externalTab, onTabChange, onSaveView, externalFilters, period = '30D', periodInfo }) {
   const [internalTab, setInternalTab] = useState('all')
   const activeTab = externalTab ?? internalTab
   function setActiveTab(t) { setInternalTab(t); onTabChange?.(t) }
@@ -134,8 +126,10 @@ export default function ProductTable({ activeTab: externalTab, onTabChange, onSa
     }
   }
 
-  const ov = OVERVIEW[activeTab]
-  const rawRows = productList[activeTab] || productList.all
+  const periodProductList = getProductListForPeriod(period)
+  const periodOverview    = getOverviewForPeriod(period)
+  const ov      = periodOverview[activeTab]    ?? periodOverview.all
+  const rawRows = periodProductList[activeTab] ?? periodProductList.all
 
   const rows = rawRows
     .filter(r => r.id.toLowerCase().includes(search.toLowerCase()))
@@ -167,6 +161,7 @@ export default function ProductTable({ activeTab: externalTab, onTabChange, onSa
       {saveViewOpen && (
         <SaveViewModal
           filters={filters}
+          periodInfo={periodInfo}
           onSave={(name, f) => onSaveView?.(name, f)}
           onClose={() => setSaveViewOpen(false)}
         />

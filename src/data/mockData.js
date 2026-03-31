@@ -108,6 +108,64 @@ export const productList = {
     { id: '466081', name: 'adidas Handball Spezial W Lucid Pink/ Almost Yellow/ Gold', variants: 4, spend: 223.45, roas: 425.83, conversions: 17.30, convValue: 951.51,  clicks: 636,  impressions: 13579 },
     { id: '407831', name: 'Nike Dunk Low Retro Pale Ivory/ Sail EUR 41',              variants: 8, spend: 198.72, roas: 480.10, conversions: 14.20, convValue: 690.86,  clicks: 267,  impressions: 12300 },
   ],
+  underperformers: [
+    { id: '334512', name: 'Hoka® M Bondi 9 Nimbus Cloud/ White EUR 44',              variants: 3, spend: 148.60, roas: 145.30, conversions:  5.10, convValue: 215.94,  clicks: 344,  impressions: 20100 },
+    { id: '223456', name: 'adidas Samba OG White/ Core Black EUR 37',                 variants: 2, spend: 138.44, roas: 209.80, conversions:  6.70, convValue: 290.47,  clicks: 321,  impressions: 18700 },
+    { id: '178902', name: 'Puma Suede Classic XXI Puma Black EUR 43',                 variants: 4, spend: 131.77, roas: 163.40, conversions:  5.90, convValue: 215.30,  clicks: 309,  impressions: 17600 },
+    { id: '501234', name: 'New Balance 574 Sea Salt/ White EUR 40',                   variants: 6, spend: 187.33, roas: 192.40, conversions:  7.20, convValue: 360.33,  clicks: 389,  impressions: 19800 },
+    { id: '119823', name: 'Salomon XT-6 Black/ Phantom EUR 42',                       variants: 2, spend: 165.88, roas: 181.10, conversions:  8.40, convValue: 300.33,  clicks: 310,  impressions: 17200 },
+  ],
+  active: [
+    { id: '416107', name: 'Sneakers Hoka® W Clifton 10 Blush/ Rose Latte EUR 36',    variants: 7, spend: 296.60, roas: 267.32, conversions: 11.31, convValue: 792.87,  clicks: 477,  impressions: 28829 },
+    { id: '466081', name: 'adidas Handball Spezial W Lucid Pink/ Almost Yellow/ Gold', variants: 4, spend: 223.45, roas: 425.83, conversions: 17.30, convValue: 951.51,  clicks: 636,  impressions: 13579 },
+    { id: '382910', name: 'Nike Air Max 90 White/ Grey Fog EUR 38',                   variants: 3, spend: 198.72, roas: 318.50, conversions:  9.80, convValue: 633.04,  clicks: 412,  impressions: 22100 },
+    { id: '290047', name: 'On Running Cloudmonster Hyper Cobalt EUR 39',              variants: 5, spend: 154.20, roas: 350.20, conversions: 12.60, convValue: 539.91,  clicks: 298,  impressions: 15400 },
+    { id: '407831', name: 'Nike Dunk Low Retro Pale Ivory/ Sail EUR 41',              variants: 8, spend: 143.90, roas: 480.10, conversions: 14.20, convValue: 690.86,  clicks: 267,  impressions: 12300 },
+    { id: '119823', name: 'Salomon XT-6 Black/ Phantom EUR 42',                       variants: 2, spend: 165.88, roas: 281.10, conversions:  8.40, convValue: 466.33,  clicks: 310,  impressions: 17200 },
+  ],
+  inactive: [],
+}
+
+// Scale factors relative to 30D baseline
+const PERIOD_SCALE = { '7D': 7/30, '14D': 14/30, '30D': 1 }
+
+// Returns a scaled copy of a product list for the given period
+function scaleList(list, factor) {
+  return list.map(p => ({
+    ...p,
+    spend:       parseFloat((p.spend       * factor).toFixed(2)),
+    convValue:   parseFloat((p.convValue   * factor).toFixed(2)),
+    conversions: parseFloat((p.conversions * factor).toFixed(2)),
+    clicks:      Math.round(p.clicks       * factor),
+    impressions: Math.round(p.impressions  * factor),
+    // ROAS is a ratio — add small realistic variance per period
+    roas: parseFloat((p.roas * (0.92 + Math.abs(Math.sin(p.id.charCodeAt(0) + factor * 10)) * 0.16)).toFixed(2)),
+  }))
+}
+
+export function getProductListForPeriod(period) {
+  const f = PERIOD_SCALE[period] ?? 1
+  return {
+    all:           scaleList(productList.all,           f),
+    losers:        scaleList(productList.losers,        f),
+    underperformers: (productList.underperformers || productList.losers).map
+      ? scaleList(productList.underperformers || productList.losers, f) : [],
+    budgetSpenders:scaleList(productList.budgetSpenders, f),
+    active:        scaleList(productList.active        || productList.all.slice(0,6), f),
+    inactive:      productList.inactive || [],
+  }
+}
+
+export function getOverviewForPeriod(period) {
+  const f = PERIOD_SCALE[period] ?? 1
+  return {
+    all:            { products: segments.total,           spend: parseFloat((15395.20 * f).toFixed(2)), revenue: parseFloat((32441.78 * f).toFixed(2)), roas: 210.73 },
+    losers:         { products: segments.losers,          spend: parseFloat(( 4155.14 * f).toFixed(2)), revenue: parseFloat((  482.00 * f).toFixed(2)), roas:  11.60 },
+    underperformers:{ products: segments.underperformers, spend: parseFloat(( 5904.87 * f).toFixed(2)), revenue: parseFloat(( 3146.34 * f).toFixed(2)), roas:  53.25 },
+    budgetSpenders: { products: segments.budgetSpenders,  spend: parseFloat(( 1583.41 * f).toFixed(2)), revenue: parseFloat(( 4202.40 * f).toFixed(2)), roas: 265.40 },
+    active:         { products: segments.active,          spend: parseFloat((10499.06 * f).toFixed(2)), revenue: parseFloat((22152.16 * f).toFixed(2)), roas: 211.00 },
+    inactive:       { products: segments.inactive,        spend: 0, revenue: 0, roas: null },
+  }
 }
 
 // Product detail — variants per product

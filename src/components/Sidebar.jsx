@@ -5,6 +5,17 @@ import RenameReportModal from './RenameReportModal'
 import DeleteReportModal from './DeleteReportModal'
 
 const OP_LABEL = { gt: '>', lt: '<', eq: '=' }
+const PRESET_LABELS = { '7D': 'Last 7 days', '14D': 'Last 14 days', '30D': 'Last 30 days', 'TM': 'This Month' }
+const MONTHS_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
+function sidebarPeriodLabel(pi) {
+  if (!pi) return null
+  if (pi.isCustom && pi.start && pi.end) {
+    const s = new Date(pi.start), e = new Date(pi.end)
+    return `📌 ${MONTHS_S[s.getMonth()]} ${s.getDate()} – ${MONTHS_S[e.getMonth()]} ${e.getDate()}`
+  }
+  return `🔄 ${PRESET_LABELS[pi.key] || pi.key}`
+}
 
 export default function Sidebar({ savedViews = [], onSelectView, onDeleteView }) {
   const [reports, setReports]           = useState(initialReports)
@@ -162,6 +173,11 @@ export default function Sidebar({ savedViews = [], onSelectView, onDeleteView })
                         )}
                       </div>
                       <div style={{ display: 'flex', gap: 4, marginTop: 4, flexWrap: 'wrap', paddingLeft: 17 }}>
+                        {v.periodInfo && (
+                          <span style={{ fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 20, background: v.periodInfo.isCustom ? '#FEF3C7' : '#DCFCE7', color: v.periodInfo.isCustom ? '#92400E' : '#15803D' }}>
+                            {sidebarPeriodLabel(v.periodInfo)}
+                          </span>
+                        )}
                         {v.filters.map(f => (
                           <span key={f.key} style={{ fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 20, background: '#EDE9FE', color: '#6D28D9' }}>
                             {f.label} {OP_LABEL[f.op]} {f.value}

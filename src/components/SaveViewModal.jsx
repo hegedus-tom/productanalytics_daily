@@ -1,6 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 
-export default function SaveViewModal({ filters, onSave, onClose }) {
+const MONTHS_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+const PRESET_LABELS = { '7D': 'Last 7 days', '14D': 'Last 14 days', '30D': 'Last 30 days', 'TM': 'This Month' }
+
+function periodLabel(periodInfo) {
+  if (!periodInfo) return null
+  if (periodInfo.isCustom && periodInfo.start && periodInfo.end) {
+    const s = new Date(periodInfo.start), e = new Date(periodInfo.end)
+    return `${MONTHS_S[s.getMonth()]} ${s.getDate()} – ${MONTHS_S[e.getMonth()]} ${e.getDate()}, ${e.getFullYear()} (static)`
+  }
+  return (PRESET_LABELS[periodInfo.key] || periodInfo.key) + ' (dynamic)'
+}
+
+export default function SaveViewModal({ filters, periodInfo, onSave, onClose }) {
   const [name, setName] = useState('')
   const inputRef = useRef(null)
 
@@ -50,6 +62,21 @@ export default function SaveViewModal({ filters, onSave, onClose }) {
 
         {/* Body */}
         <div style={{ padding: '20px 22px' }}>
+          {/* Period summary */}
+          {periodInfo && (
+            <div style={{ marginBottom: 14 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Date range</div>
+              <span style={{
+                fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 20,
+                background: periodInfo.isCustom ? '#FEF3C7' : '#DCFCE7',
+                color: periodInfo.isCustom ? '#92400E' : '#15803D',
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+              }}>
+                {periodInfo.isCustom ? '📌' : '🔄'} {periodLabel(periodInfo)}
+              </span>
+            </div>
+          )}
+
           {/* Active filters summary */}
           <div style={{ marginBottom: 18 }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Active filters</div>
