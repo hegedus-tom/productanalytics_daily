@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { productList, segments } from '../data/mockData'
 import FilterBar from './FilterBar'
+import ProductModal from './ProductModal'
 
 function fmt(n) { return '€' + n.toLocaleString('en-EU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
 function fmtPct(n) { return n.toFixed(2) + '%' }
@@ -108,10 +109,11 @@ export default function ProductTable({ activeTab: externalTab, onTabChange }) {
   const activeTab = externalTab ?? internalTab
   function setActiveTab(t) { setInternalTab(t); onTabChange?.(t) }
 
-  const [search,  setSearch]  = useState('')
-  const [filters, setFilters] = useState([])
-  const [sortCol, setSortCol] = useState(null)   // col key
-  const [sortDir, setSortDir] = useState('asc')  // 'asc' | 'desc'
+  const [search,     setSearch]     = useState('')
+  const [filters,    setFilters]    = useState([])
+  const [sortCol,    setSortCol]    = useState(null)
+  const [sortDir,    setSortDir]    = useState('asc')
+  const [modalId,    setModalId]    = useState(null)
 
   function handleSort(colKey) {
     if (sortCol === colKey) {
@@ -146,6 +148,8 @@ export default function ProductTable({ activeTab: externalTab, onTabChange }) {
     })
 
   return (
+    <>
+    {modalId && <ProductModal productId={modalId} onClose={() => setModalId(null)} />}
     <div className="section-wrap" style={{ marginBottom: 28 }}>
       <div className="section-title">Product analytics</div>
       <div className="section-subtitle">A complete analysis of your product portfolio, organized into key product segments.</div>
@@ -296,10 +300,10 @@ export default function ProductTable({ activeTab: externalTab, onTabChange }) {
               {rows.map(r => (
                 <tr key={r.id}>
                   <td>
-                    <span className="product-id-link">{r.id}</span>
+                    <span className="product-id-link" onClick={() => setModalId(r.id)} style={{ cursor: 'pointer' }}>{r.id}</span>
                     {r.variants && <span className="variant-badge">{r.variants} variants</span>}
                   </td>
-                  <td style={{ color: '#9CA3AF', fontSize: 12 }}>—</td>
+                  <td style={{ fontSize: 12, color: '#374151', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name || '—'}</td>
                   <td>{fmt(r.spend)}</td>
                   <td>
                     <span style={{ fontWeight: 700, color: r.roas < 100 ? '#DC2626' : r.roas > 300 ? '#15803D' : '#111827' }}>
@@ -317,5 +321,6 @@ export default function ProductTable({ activeTab: externalTab, onTabChange }) {
         </div>
       </div>
     </div>
+    </>
   )
 }

@@ -95,8 +95,8 @@ export default function App() {
             {tab === 'daily' ? (
               <>
                 <KPISummary period={period} />
-                <PerformanceTrend period={period} />
                 <PerformanceInsights onInsightClick={handleInsightClick} />
+                <PerformanceTrend period={period} />
                 <hr className="divider" />
                 <ProductCatalogOverview />
                 <DayOfWeekChart />

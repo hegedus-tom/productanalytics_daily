@@ -50,8 +50,31 @@ function CustomTooltip({ active, payload, label }) {
   )
 }
 
+const METRIC_CONFIG = {
+  roas: {
+    subtitle:   'Daily spend vs ROAS — see how your return on ad spend is trending',
+    howToRead:  'Bars show how much you spent each day. The purple line shows your ROAS — the higher, the better. Red dots = days your ROAS was dangerously low. Green dots = exceptional days. The dashed line at 100% is break-even: below it, you\'re losing money.',
+    lineLabel:  'ROAS (%)',
+    lineColor:  '#7C3AED',
+  },
+  revenue: {
+    subtitle:   'Daily spend vs revenue — see how much your ads are generating',
+    howToRead:  'Bars show how much you spent each day. The blue line shows your daily revenue. When the revenue line is far above the bars, your ads are generating strong returns. A narrowing gap may signal declining efficiency.',
+    lineLabel:  'Revenue (€)',
+    lineColor:  '#0EA5E9',
+  },
+  clicks: {
+    subtitle:   'Daily spend vs clicks — see how much traffic your ads are driving',
+    howToRead:  'Bars show daily spend. The amber line shows how many clicks your ads received each day. Compare spend to clicks to spot days where you paid more per click — a sign of rising competition or worsening quality scores.',
+    lineLabel:  'Clicks',
+    lineColor:  '#F59E0B',
+  },
+}
+
 export default function PerformanceTrend({ period }) {
   const [metric, setMetric] = useState('roas')
+  const cfg = METRIC_CONFIG[metric]
+
   const valid = dailyStats.filter(d => !d.partial)
   const sliced = period === '7D' ? valid.slice(-7) : period === '14D' ? valid.slice(-14) : valid
 
@@ -66,7 +89,7 @@ export default function PerformanceTrend({ period }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
         <div>
           <div className="card-title">Performance over time</div>
-          <div className="card-subtitle">Daily spend and ROAS — see how your campaigns are trending</div>
+          <div className="card-subtitle">{cfg.subtitle}</div>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {['roas', 'revenue', 'clicks'].map(m => (
@@ -96,7 +119,7 @@ export default function PerformanceTrend({ period }) {
         </div>
       )}
 
-      <HowToRead text="Bars show how much you spent each day. The purple line shows your ROAS — the higher, the better. Red dots = days your ROAS was dangerously low. Green dots = exceptional days. The dashed line at 100% is break-even: below it, you're losing money." />
+      <HowToRead text={cfg.howToRead} />
 
       <ResponsiveContainer width="100%" height={300}>
         <ComposedChart data={data} margin={{ top: 10, right: 55, left: 10, bottom: 0 }}>
@@ -117,22 +140,24 @@ export default function PerformanceTrend({ period }) {
           <YAxis
             yAxisId="right"
             orientation="right"
-            tickFormatter={v => `${v}%`}
+            tickFormatter={v => metric === 'clicks' ? v.toLocaleString() : `${v}%`}
             tick={{ fontSize: 11, fill: '#9CA3AF' }}
             axisLine={false} tickLine={false}
             width={50}
           />
           <Tooltip content={<CustomTooltip />} />
-          <ReferenceLine
-            yAxisId="right" y={100}
-            stroke="#FCA5A5" strokeDasharray="5 4" strokeWidth={1.5}
-            label={{ value: 'Break-even', position: 'right', fill: '#EF4444', fontSize: 10 }}
-          />
-          <ReferenceLine
-            yAxisId="right" y={AVG_ROAS}
-            stroke="#C4B5FD" strokeDasharray="5 4" strokeWidth={1.5}
-            label={{ value: 'Avg ROAS', position: 'right', fill: '#7C3AED', fontSize: 10 }}
-          />
+          {metric === 'roas' && <>
+            <ReferenceLine
+              yAxisId="right" y={100}
+              stroke="#FCA5A5" strokeDasharray="5 4" strokeWidth={1.5}
+              label={{ value: 'Break-even', position: 'right', fill: '#EF4444', fontSize: 10 }}
+            />
+            <ReferenceLine
+              yAxisId="right" y={AVG_ROAS}
+              stroke="#C4B5FD" strokeDasharray="5 4" strokeWidth={1.5}
+              label={{ value: 'Avg ROAS', position: 'right', fill: '#7C3AED', fontSize: 10 }}
+            />
+          </>}
           <Bar
             yAxisId="left"
             dataKey="spend"
@@ -182,22 +207,35 @@ export default function PerformanceTrend({ period }) {
       </ResponsiveContainer>
 
       <div style={{ display: 'flex', gap: 20, marginTop: 12, fontSize: 11, color: '#9CA3AF', flexWrap: 'wrap' }}>
+        {/* Always shown */}
         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#DC2626', display: 'inline-block' }} />
-          Low ROAS day
+          <span style={{ width: 14, height: 10, borderRadius: 2, background: '#DDD6FE', display: 'inline-block' }} />
+          Daily spend
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#16A34A', display: 'inline-block' }} />
-          High ROAS day
+          <span style={{ width: 28, height: 2, background: cfg.lineColor, display: 'inline-block', borderRadius: 2 }} />
+          {cfg.lineLabel}
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span style={{ width: 28, height: 2, background: '#FCA5A5', display: 'inline-block' }} />
-          Break-even (100%)
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span style={{ width: 28, height: 2, background: '#C4B5FD', display: 'inline-block' }} />
-          30-day avg ROAS ({AVG_ROAS}%)
-        </span>
+
+        {/* ROAS-only items */}
+        {metric === 'roas' && <>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#DC2626', display: 'inline-block' }} />
+            Low ROAS day
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#16A34A', display: 'inline-block' }} />
+            High ROAS day
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ width: 28, height: 2, background: '#FCA5A5', display: 'inline-block' }} />
+            Break-even (100%)
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ width: 28, height: 2, background: '#C4B5FD', display: 'inline-block' }} />
+            Avg ROAS ({AVG_ROAS}%)
+          </span>
+        </>}
       </div>
     </div>
   )

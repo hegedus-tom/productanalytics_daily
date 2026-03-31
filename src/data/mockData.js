@@ -85,29 +85,83 @@ export const topMovers = {
 // Product list for the analytics table
 export const productList = {
   all: [
-    { id: '416107', variants: 7, spend: 296.60, roas: 267.32, conversions: 11.31, convValue: 792.87,  clicks: 477,  impressions: 28829 },
-    { id: '466081', variants: 4, spend: 223.45, roas: 425.83, conversions: 17.30, convValue: 951.51,  clicks: 636,  impressions: 13579 },
-    { id: '382910', variants: 3, spend: 198.72, roas: 318.50, conversions:  9.80, convValue: 633.04,  clicks: 412,  impressions: 22100 },
-    { id: '501234', variants: 6, spend: 187.33, roas: 192.40, conversions:  7.20, convValue: 360.33,  clicks: 389,  impressions: 19800 },
-    { id: '119823', variants: 2, spend: 165.88, roas: 281.10, conversions:  8.40, convValue: 466.33,  clicks: 310,  impressions: 17200 },
-    { id: '290047', variants: 5, spend: 154.20, roas: 350.20, conversions: 12.60, convValue: 539.91,  clicks: 298,  impressions: 15400 },
-    { id: '334512', variants: 3, spend: 148.60, roas: 145.30, conversions:  5.10, convValue: 215.94,  clicks: 344,  impressions: 20100 },
-    { id: '407831', variants: 8, spend: 143.90, roas: 480.10, conversions: 14.20, convValue: 690.86,  clicks: 267,  impressions: 12300 },
-    { id: '223456', variants: 2, spend: 138.44, roas: 209.80, conversions:  6.70, convValue: 290.47,  clicks: 321,  impressions: 18700 },
-    { id: '178902', variants: 4, spend: 131.77, roas: 163.40, conversions:  5.90, convValue: 215.30,  clicks: 309,  impressions: 17600 },
+    { id: '416107', name: 'Sneakers Hoka® W Clifton 10 Blush/ Rose Latte EUR 36',    variants: 7, spend: 296.60, roas: 267.32, conversions: 11.31, convValue: 792.87,  clicks: 477,  impressions: 28829 },
+    { id: '466081', name: 'adidas Handball Spezial W Lucid Pink/ Almost Yellow/ Gold', variants: 4, spend: 223.45, roas: 425.83, conversions: 17.30, convValue: 951.51,  clicks: 636,  impressions: 13579 },
+    { id: '382910', name: 'Nike Air Max 90 White/ Grey Fog EUR 38',                   variants: 3, spend: 198.72, roas: 318.50, conversions:  9.80, convValue: 633.04,  clicks: 412,  impressions: 22100 },
+    { id: '501234', name: 'New Balance 574 Sea Salt/ White EUR 40',                   variants: 6, spend: 187.33, roas: 192.40, conversions:  7.20, convValue: 360.33,  clicks: 389,  impressions: 19800 },
+    { id: '119823', name: 'Salomon XT-6 Black/ Phantom EUR 42',                       variants: 2, spend: 165.88, roas: 281.10, conversions:  8.40, convValue: 466.33,  clicks: 310,  impressions: 17200 },
+    { id: '290047', name: 'On Running Cloudmonster Hyper Cobalt EUR 39',              variants: 5, spend: 154.20, roas: 350.20, conversions: 12.60, convValue: 539.91,  clicks: 298,  impressions: 15400 },
+    { id: '334512', name: 'Hoka® M Bondi 9 Nimbus Cloud/ White EUR 44',              variants: 3, spend: 148.60, roas: 145.30, conversions:  5.10, convValue: 215.94,  clicks: 344,  impressions: 20100 },
+    { id: '407831', name: 'Nike Dunk Low Retro Pale Ivory/ Sail EUR 41',              variants: 8, spend: 143.90, roas: 480.10, conversions: 14.20, convValue: 690.86,  clicks: 267,  impressions: 12300 },
+    { id: '223456', name: 'adidas Samba OG White/ Core Black EUR 37',                 variants: 2, spend: 138.44, roas: 209.80, conversions:  6.70, convValue: 290.47,  clicks: 321,  impressions: 18700 },
+    { id: '178902', name: 'Puma Suede Classic XXI Puma Black EUR 43',                 variants: 4, spend: 131.77, roas: 163.40, conversions:  5.90, convValue: 215.30,  clicks: 309,  impressions: 17600 },
   ],
   losers: [
-    { id: '234789', variants: 3, spend: 125.40, roas:  79.3, conversions:  2.10, convValue:  99.44,  clicks: 298,  impressions: 17200 },
-    { id: '345012', variants: 2, spend:  98.70, roas:  94.8, conversions:  1.80, convValue:  93.51,  clicks: 241,  impressions: 14100 },
-    { id: '156789', variants: 4, spend:  87.30, roas: 109.6, conversions:  2.40, convValue:  95.68,  clicks: 212,  impressions: 12400 },
-    { id: '278901', variants: 1, spend:  76.50, roas:  82.4, conversions:  1.30, convValue:  63.00,  clicks: 187,  impressions: 10900 },
-    { id: '401234', variants: 3, spend:  68.90, roas:  95.1, conversions:  1.60, convValue:  65.52,  clicks: 168,  impressions:  9800 },
+    { id: '234789', name: 'Vans Old Skool Classic Marshmallow EUR 36',                variants: 3, spend: 125.40, roas:  79.3, conversions:  2.10, convValue:  99.44,  clicks: 298,  impressions: 17200 },
+    { id: '345012', name: 'Reebok Club C 85 Chalk/ Paperwhite EUR 38',               variants: 2, spend:  98.70, roas:  94.8, conversions:  1.80, convValue:  93.51,  clicks: 241,  impressions: 14100 },
+    { id: '156789', name: 'Converse Chuck Taylor AS Hi Egret EUR 40',                 variants: 4, spend:  87.30, roas: 109.6, conversions:  2.40, convValue:  95.68,  clicks: 212,  impressions: 12400 },
+    { id: '278901', name: 'New Balance 327 Rain Cloud/ Sea Salt EUR 41',              variants: 1, spend:  76.50, roas:  82.4, conversions:  1.30, convValue:  63.00,  clicks: 187,  impressions: 10900 },
+    { id: '401234', name: 'Asics Gel-Kayano 31 Pale Mint/ Cream EUR 39',             variants: 3, spend:  68.90, roas:  95.1, conversions:  1.60, convValue:  65.52,  clicks: 168,  impressions:  9800 },
   ],
   budgetSpenders: [
-    { id: '416107', variants: 7, spend: 296.60, roas: 267.32, conversions: 11.31, convValue: 792.87,  clicks: 477,  impressions: 28829 },
-    { id: '466081', variants: 4, spend: 223.45, roas: 425.83, conversions: 17.30, convValue: 951.51,  clicks: 636,  impressions: 13579 },
-    { id: '407831', variants: 8, spend: 198.72, roas: 480.10, conversions: 14.20, convValue: 690.86,  clicks: 267,  impressions: 12300 },
+    { id: '416107', name: 'Sneakers Hoka® W Clifton 10 Blush/ Rose Latte EUR 36',    variants: 7, spend: 296.60, roas: 267.32, conversions: 11.31, convValue: 792.87,  clicks: 477,  impressions: 28829 },
+    { id: '466081', name: 'adidas Handball Spezial W Lucid Pink/ Almost Yellow/ Gold', variants: 4, spend: 223.45, roas: 425.83, conversions: 17.30, convValue: 951.51,  clicks: 636,  impressions: 13579 },
+    { id: '407831', name: 'Nike Dunk Low Retro Pale Ivory/ Sail EUR 41',              variants: 8, spend: 198.72, roas: 480.10, conversions: 14.20, convValue: 690.86,  clicks: 267,  impressions: 12300 },
   ],
+}
+
+// Product detail — variants per product
+export const productDetails = {
+  '416107': {
+    name: 'Sneakers Hoka® W Clifton 10 Blush/ Rose Latte',
+    brand: 'Hoka',
+    category: 'Running Shoes',
+    variants: [
+      { sku: '416107_36', size: 'EUR 36', spend: 52.10, roas: 290.4, clicks: 82,  impressions: 4810, conversions: 2.10, convValue: 151.30, status: 'active' },
+      { sku: '416107_37', size: 'EUR 37', spend: 48.30, roas: 310.2, clicks: 74,  impressions: 4320, conversions: 1.90, convValue: 149.80, status: 'active' },
+      { sku: '416107_38', size: 'EUR 38', spend: 61.20, roas: 241.0, clicks: 98,  impressions: 5900, conversions: 2.40, convValue: 147.49, status: 'active' },
+      { sku: '416107_39', size: 'EUR 39', spend: 44.80, roas: 279.6, clicks: 69,  impressions: 4100, conversions: 1.70, convValue: 125.30, status: 'active' },
+      { sku: '416107_40', size: 'EUR 40', spend: 39.20, roas: 251.3, clicks: 63,  impressions: 3800, conversions: 1.60, convValue:  98.51, status: 'active' },
+      { sku: '416107_41', size: 'EUR 41', spend: 30.10, roas: 198.7, clicks: 52,  impressions: 3200, conversions: 1.20, convValue:  59.83, status: 'active' },
+      { sku: '416107_42', size: 'EUR 42', spend: 20.90, roas: 322.4, clicks: 39,  impressions: 2699, conversions: 1.41, convValue:  60.64, status: 'active' },
+    ],
+  },
+  '466081': {
+    name: 'adidas Handball Spezial W Lucid Pink/ Almost Yellow/ Gold',
+    brand: 'adidas',
+    category: 'Lifestyle Shoes',
+    variants: [
+      { sku: '466081_36', size: 'EUR 36', spend: 58.20, roas: 480.1, clicks: 170, impressions: 3560, conversions: 4.90, convValue: 279.49, status: 'active' },
+      { sku: '466081_37', size: 'EUR 37', spend: 62.10, roas: 401.3, clicks: 180, impressions: 3800, conversions: 5.10, convValue: 249.21, status: 'active' },
+      { sku: '466081_38', size: 'EUR 38', spend: 55.40, roas: 443.8, clicks: 160, impressions: 3220, conversions: 4.60, convValue: 245.87, status: 'active' },
+      { sku: '466081_39', size: 'EUR 39', spend: 47.75, roas: 380.0, clicks: 126, impressions: 2999, conversions: 2.70, convValue: 181.50, status: 'active' },
+    ],
+  },
+  '234789': {
+    name: 'Vans Old Skool Classic Marshmallow',
+    brand: 'Vans',
+    category: 'Lifestyle Shoes',
+    variants: [
+      { sku: '234789_36', size: 'EUR 36', spend: 44.20, roas:  72.1, clicks: 108, impressions: 6200, conversions: 0.70, convValue:  31.87, status: 'active' },
+      { sku: '234789_38', size: 'EUR 38', spend: 41.80, roas:  85.4, clicks:  99, impressions: 5700, conversions: 0.80, convValue:  35.70, status: 'active' },
+      { sku: '234789_40', size: 'EUR 40', spend: 39.40, roas:  81.6, clicks:  91, impressions: 5300, conversions: 0.60, convValue:  32.15, status: 'active' },
+    ],
+  },
+  '407831': {
+    name: 'Nike Dunk Low Retro Pale Ivory/ Sail',
+    brand: 'Nike',
+    category: 'Lifestyle Shoes',
+    variants: [
+      { sku: '407831_36', size: 'EUR 36', spend: 20.10, roas: 510.2, clicks: 34,  impressions: 1580, conversions: 1.90, convValue: 102.55, status: 'active' },
+      { sku: '407831_37', size: 'EUR 37', spend: 22.30, roas: 491.0, clicks: 36,  impressions: 1640, conversions: 2.10, convValue: 109.49, status: 'active' },
+      { sku: '407831_38', size: 'EUR 38', spend: 18.70, roas: 498.4, clicks: 30,  impressions: 1380, conversions: 1.80, convValue:  93.20, status: 'active' },
+      { sku: '407831_39', size: 'EUR 39', spend: 21.40, roas: 464.5, clicks: 33,  impressions: 1510, conversions: 1.90, convValue:  99.40, status: 'active' },
+      { sku: '407831_40', size: 'EUR 40', spend: 19.80, roas: 487.2, clicks: 31,  impressions: 1440, conversions: 1.80, convValue:  96.47, status: 'active' },
+      { sku: '407831_41', size: 'EUR 41', spend: 24.10, roas: 453.0, clicks: 39,  impressions: 1820, conversions: 2.20, convValue: 109.17, status: 'active' },
+      { sku: '407831_42', size: 'EUR 42', spend: 17.50, roas: 471.3, clicks: 28,  impressions: 1290, conversions: 1.60, convValue:  82.48, status: 'active' },
+      { sku: '407831_43', size: 'EUR 43', spend: 0,     roas: null,  clicks:  0,  impressions:    0, conversions:  0,   convValue:   0,    status: 'inactive' },
+    ],
+  },
 }
 
 // Reports list for sidebar
