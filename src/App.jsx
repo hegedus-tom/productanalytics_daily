@@ -10,6 +10,7 @@ import TopMovers from './components/TopMovers'
 import ProductTable from './components/ProductTable'
 import CurrentView from './views/CurrentView'
 import DateRangePicker from './components/DateRangePicker'
+import LimitedDateRangePicker from './components/LimitedDateRangePicker'
 
 const TABS = [
   { key: 'daily',   label: 'Daily',   badge: 'New ✦' },
@@ -119,8 +120,10 @@ export default function App() {
           <div className="page-header">
             <h1 className="page-title">Product analytics</h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              {isDailyLike ? (
+              {tab === 'daily' ? (
                 <DateRangePicker onApply={handleApply} />
+              ) : tab === 'limited' ? (
+                <LimitedDateRangePicker onApply={handleApply} />
               ) : (
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px',
