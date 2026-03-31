@@ -11,7 +11,7 @@ const FILTER_FIELDS = [
 const OPS = ['gt', 'lt', 'eq']
 const OP_LABEL = { gt: 'Greater than', lt: 'Lower than', eq: 'Equal to' }
 
-export default function FilterBar({ filters, onChange }) {
+export default function FilterBar({ filters, onChange, onSaveView }) {
   const [open, setOpen]         = useState(false)
   const [submenu, setSubmenu]   = useState(null) // field key with open submenu
   const ref = useRef(null)
@@ -147,22 +147,40 @@ export default function FilterBar({ filters, onChange }) {
         </div>
       ))}
 
-      {/* Reset */}
+      {/* Save view + Reset */}
       {filters.length > 0 && (
-        <button
-          onClick={() => onChange([])}
-          style={{
-            marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5,
-            border: 'none', background: 'none', cursor: 'pointer',
-            fontSize: 13, fontWeight: 700, color: '#DC2626', fontFamily: 'inherit',
-          }}
-        >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-            <line x1="2" y1="2" x2="22" y2="22"/>
-          </svg>
-          Reset
-        </button>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button
+            onClick={onSaveView}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '6px 13px', border: '1px solid #C4B5FD', borderRadius: 7,
+              background: '#EDE9FE', cursor: 'pointer',
+              fontSize: 13, fontWeight: 600, color: '#6D28D9', fontFamily: 'inherit',
+            }}
+          >
+            {/* Eye icon */}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            Save view
+          </button>
+          <button
+            onClick={() => onChange([])}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 5,
+              border: 'none', background: 'none', cursor: 'pointer',
+              fontSize: 13, fontWeight: 700, color: '#DC2626', fontFamily: 'inherit',
+            }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+              <line x1="2" y1="2" x2="22" y2="22"/>
+            </svg>
+            Reset
+          </button>
+        </div>
       )}
     </div>
   )

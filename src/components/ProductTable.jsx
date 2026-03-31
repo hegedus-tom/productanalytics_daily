@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { productList, segments } from '../data/mockData'
 import FilterBar from './FilterBar'
 import ProductModal from './ProductModal'
+import SaveViewModal from './SaveViewModal'
 
 function fmt(n) { return '€' + n.toLocaleString('en-EU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
 function fmtPct(n) { return n.toFixed(2) + '%' }
@@ -104,16 +105,25 @@ function SortArrow({ col, sortCol, sortDir }) {
   )
 }
 
-export default function ProductTable({ activeTab: externalTab, onTabChange }) {
+export default function ProductTable({ activeTab: externalTab, onTabChange, onSaveView, externalFilters }) {
   const [internalTab, setInternalTab] = useState('all')
   const activeTab = externalTab ?? internalTab
   function setActiveTab(t) { setInternalTab(t); onTabChange?.(t) }
 
-  const [search,     setSearch]     = useState('')
-  const [filters,    setFilters]    = useState([])
-  const [sortCol,    setSortCol]    = useState(null)
-  const [sortDir,    setSortDir]    = useState('asc')
-  const [modalId,    setModalId]    = useState(null)
+  const [search,       setSearch]       = useState('')
+  const [filters,      setFilters]      = useState([])
+  const [sortCol,      setSortCol]      = useState(null)
+  const [sortDir,      setSortDir]      = useState('asc')
+  const [modalId,      setModalId]      = useState(null)
+  const [saveViewOpen, setSaveViewOpen] = useState(false)
+
+  // apply externally triggered filters (from saved view click in sidebar)
+  // externalFilters is wrapped as { filters, ts } in App so re-clicking the same view always fires
+  useEffect(() => {
+    if (externalFilters?.filters) {
+      setFilters(externalFilters.filters)
+    }
+  }, [externalFilters])
 
   function handleSort(colKey) {
     if (sortCol === colKey) {
@@ -154,7 +164,14 @@ export default function ProductTable({ activeTab: externalTab, onTabChange }) {
       <div className="section-title">Product intelligence</div>
       <div className="section-subtitle">A complete analysis of your product portfolio, organized into key product segments.</div>
 
-      <FilterBar filters={filters} onChange={setFilters} />
+      {saveViewOpen && (
+        <SaveViewModal
+          filters={filters}
+          onSave={(name, f) => onSaveView?.(name, f)}
+          onClose={() => setSaveViewOpen(false)}
+        />
+      )}
+      <FilterBar filters={filters} onChange={setFilters} onSaveView={() => setSaveViewOpen(true)} />
 
       <div className="tabs">
         {TABS.map(t => (

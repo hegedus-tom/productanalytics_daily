@@ -12,15 +12,27 @@ import CurrentView from './views/CurrentView'
 import DateRangePicker from './components/DateRangePicker'
 
 export default function App() {
-  const [tab, setTab]           = useState('daily')
-  const [period, setPeriod]     = useState('7D')
+  const [tab, setTab]               = useState('daily')
+  const [period, setPeriod]         = useState('7D')
   const [productTab, setProductTab] = useState('all')
+  const [savedViews, setSavedViews] = useState([])
+  const [activeViewFilters, setActiveViewFilters] = useState(null)
   const tableRef = useRef(null)
 
   function handleApply(periodKey) { setPeriod(periodKey) }
 
   function handleInsightClick(tabKey) {
     setProductTab(tabKey)
+    setTimeout(() => tableRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
+  }
+
+  function handleSaveView(name, filters) {
+    setSavedViews(prev => [...prev, { id: Date.now(), name, filters }])
+  }
+
+  function handleSelectView(view) {
+    // wrap with ts so re-clicking the same view still fires the useEffect
+    setActiveViewFilters({ filters: view.filters, ts: Date.now() })
     setTimeout(() => tableRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
   }
 
@@ -70,7 +82,11 @@ export default function App() {
 
       {/* ── Body (sidebar + main) ─────────────────────────────────────── */}
       <div className="app" style={{ flex: 1, overflow: 'hidden' }}>
-        <Sidebar />
+        <Sidebar
+          savedViews={savedViews}
+          onSelectView={handleSelectView}
+          onDeleteView={id => setSavedViews(prev => prev.filter(v => v.id !== id))}
+        />
 
         <div className="main">
           {/* Page header */}
@@ -99,13 +115,18 @@ export default function App() {
                 <PerformanceTrend period={period} />
                 <hr className="divider" />
                 <ProductCatalogOverview />
-                <DayOfWeekChart />
                 <hr className="divider" />
                 <ProductCoverage />
                 <hr className="divider" />
                 <TopMovers />
+                <DayOfWeekChart />
                 <div ref={tableRef}>
-                  <ProductTable activeTab={productTab} onTabChange={setProductTab} />
+                  <ProductTable
+                    activeTab={productTab}
+                    onTabChange={setProductTab}
+                    onSaveView={handleSaveView}
+                    externalFilters={activeViewFilters}
+                  />
                 </div>
               </>
             ) : (
