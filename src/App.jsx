@@ -9,13 +9,13 @@ import ProductCoverage from './components/ProductCoverage'
 import TopMovers from './components/TopMovers'
 import ProductTable from './components/ProductTable'
 import CurrentView from './views/CurrentView'
-
-const PERIODS = ['7D', '14D', '30D']
-const PERIOD_LABELS = { '7D': 'Last 7 days', '14D': 'Last 14 days', '30D': 'Last 30 days' }
+import DateRangePicker from './components/DateRangePicker'
 
 export default function App() {
-  const [tab, setTab]       = useState('daily')   // 'daily' | 'current'
+  const [tab, setTab]       = useState('daily')
   const [period, setPeriod] = useState('30D')
+
+  function handleApply(periodKey) { setPeriod(periodKey) }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
@@ -71,13 +71,7 @@ export default function App() {
             <h1 className="page-title">Product analytics</h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               {tab === 'daily' ? (
-                <div className="period-selector">
-                  {PERIODS.map(p => (
-                    <button key={p} className={`period-btn ${period === p ? 'active' : ''}`} onClick={() => setPeriod(p)}>
-                      {PERIOD_LABELS[p]}
-                    </button>
-                  ))}
-                </div>
+                <DateRangePicker onApply={handleApply} />
               ) : (
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 8, padding: '7px 14px',
