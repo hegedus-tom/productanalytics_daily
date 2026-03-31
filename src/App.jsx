@@ -11,6 +11,37 @@ import ProductTable from './components/ProductTable'
 import CurrentView from './views/CurrentView'
 import DateRangePicker from './components/DateRangePicker'
 
+const TABS = [
+  { key: 'daily',   label: 'Daily',   badge: 'New ✦' },
+  { key: 'limited', label: 'Limited', badge: null },
+  { key: 'current', label: 'Current', badge: null },
+]
+
+function DailyContent({ period, onInsightClick, tableRef, productTab, setProductTab, onSaveView, activeViewFilters }) {
+  return (
+    <>
+      <KPISummary period={period} />
+      <PerformanceInsights onInsightClick={onInsightClick} />
+      <PerformanceTrend period={period} />
+      <hr className="divider" />
+      <ProductCatalogOverview />
+      <hr className="divider" />
+      <ProductCoverage />
+      <hr className="divider" />
+      <TopMovers />
+      <DayOfWeekChart />
+      <div ref={tableRef}>
+        <ProductTable
+          activeTab={productTab}
+          onTabChange={setProductTab}
+          onSaveView={onSaveView}
+          externalFilters={activeViewFilters}
+        />
+      </div>
+    </>
+  )
+}
+
 export default function App() {
   const [tab, setTab]               = useState('daily')
   const [period, setPeriod]         = useState('7D')
@@ -31,10 +62,11 @@ export default function App() {
   }
 
   function handleSelectView(view) {
-    // wrap with ts so re-clicking the same view still fires the useEffect
     setActiveViewFilters({ filters: view.filters, ts: Date.now() })
     setTimeout(() => tableRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
   }
+
+  const isDailyLike = tab === 'daily' || tab === 'limited'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
@@ -52,10 +84,7 @@ export default function App() {
           </span>
         </div>
 
-        {[
-          { key: 'daily',   label: 'Daily',   badge: 'New ✦' },
-          { key: 'current', label: 'Current',  badge: null },
-        ].map(t => (
+        {TABS.map(t => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
@@ -69,10 +98,7 @@ export default function App() {
           >
             {t.label}
             {t.badge && (
-              <span style={{
-                fontSize: 10, fontWeight: 700, background: '#EDE9FE', color: '#6D28D9',
-                padding: '2px 6px', borderRadius: 20,
-              }}>
+              <span style={{ fontSize: 10, fontWeight: 700, background: '#EDE9FE', color: '#6D28D9', padding: '2px 6px', borderRadius: 20 }}>
                 {t.badge}
               </span>
             )}
@@ -93,7 +119,7 @@ export default function App() {
           <div className="page-header">
             <h1 className="page-title">Product analytics</h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              {tab === 'daily' ? (
+              {isDailyLike ? (
                 <DateRangePicker onApply={handleApply} />
               ) : (
                 <div style={{
@@ -108,30 +134,29 @@ export default function App() {
           </div>
 
           <div className="content">
-            {tab === 'daily' ? (
-              <>
-                <KPISummary period={period} />
-                <PerformanceInsights onInsightClick={handleInsightClick} />
-                <PerformanceTrend period={period} />
-                <hr className="divider" />
-                <ProductCatalogOverview />
-                <hr className="divider" />
-                <ProductCoverage />
-                <hr className="divider" />
-                <TopMovers />
-                <DayOfWeekChart />
-                <div ref={tableRef}>
-                  <ProductTable
-                    activeTab={productTab}
-                    onTabChange={setProductTab}
-                    onSaveView={handleSaveView}
-                    externalFilters={activeViewFilters}
-                  />
-                </div>
-              </>
-            ) : (
-              <CurrentView />
+            {tab === 'daily' && (
+              <DailyContent
+                period={period}
+                onInsightClick={handleInsightClick}
+                tableRef={tableRef}
+                productTab={productTab}
+                setProductTab={setProductTab}
+                onSaveView={handleSaveView}
+                activeViewFilters={activeViewFilters}
+              />
             )}
+            {tab === 'limited' && (
+              <DailyContent
+                period={period}
+                onInsightClick={handleInsightClick}
+                tableRef={tableRef}
+                productTab={productTab}
+                setProductTab={setProductTab}
+                onSaveView={handleSaveView}
+                activeViewFilters={activeViewFilters}
+              />
+            )}
+            {tab === 'current' && <CurrentView />}
           </div>
         </div>
       </div>
