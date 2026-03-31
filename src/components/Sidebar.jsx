@@ -194,10 +194,10 @@ export default function Sidebar({ savedViews = [], onSelectView, onDeleteView })
 
         <div style={{ borderTop: '1px solid #F3F4F6' }}>
           <div className="sidebar-section-title">Data source</div>
-          <a className="sidebar-ds-link">Footshop SE – Google Ads – s hopping Argjend</a>
+          <a className="sidebar-ds-link">Footshop SE – Google Ads</a>
           <div className="sidebar-section-title" style={{ marginTop: 4 }}>Product stats</div>
           <div className="sidebar-ds-sub">Google Ads product stats</div>
-          <a className="sidebar-ds-link" style={{ fontSize: 12 }}>Google product stats – Argjend</a>
+          <a className="sidebar-ds-link" style={{ fontSize: 12 }}>Google product stats Footshop</a>
         </div>
       </div>
     </>

@@ -8,8 +8,8 @@ function MoverTable({ movers, dir, onSelect }) {
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '0 16px', padding: '0 0 8px', borderBottom: '1px solid #F3F4F6', marginBottom: 4 }}>
         <span style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Product</span>
-        <span style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>ROAS</span>
-        <span style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Change</span>
+        <span style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Revenue / wk</span>
+        <span style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>ROAS Δ</span>
       </div>
       {movers.map((m, i) => (
         <div key={m.id} style={{
@@ -17,18 +17,24 @@ function MoverTable({ movers, dir, onSelect }) {
           padding: '10px 0', borderBottom: i < movers.length - 1 ? '1px solid #F9FAFB' : 'none',
           alignItems: 'center',
         }}>
-          <div style={{ borderLeft: `3px solid ${dir === 'up' ? '#22C55E' : '#EF4444'}`, paddingLeft: 10 }}>
-            <span
+          {/* Product: name + id */}
+          <div style={{ borderLeft: `3px solid ${dir === 'up' ? '#22C55E' : '#EF4444'}`, paddingLeft: 10, minWidth: 0 }}>
+            <div
               onClick={() => onSelect(m.id)}
-              style={{ fontSize: 13, fontWeight: 600, color: '#6D28D9', fontFamily: 'monospace', cursor: 'pointer', textDecoration: 'none' }}
-            >{m.id}</span>
+              style={{ fontSize: 13, fontWeight: 600, color: '#111827', cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            >{m.name}</div>
+            <div style={{ fontSize: 11, color: '#9CA3AF', fontFamily: 'monospace', marginTop: 1 }}>{m.id}</div>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: m.roasCurrent < 100 ? '#DC2626' : '#111827' }}>
-              {m.roasCurrent.toFixed(1)}%
+
+          {/* Revenue: now / was */}
+          <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: dir === 'up' ? '#15803D' : (m.revenueL7 < m.revenuePrior ? '#DC2626' : '#111827') }}>
+              €{m.revenueL7.toFixed(0)}/wk
             </div>
-            <div style={{ fontSize: 11, color: '#9CA3AF' }}>was {m.roasPrior.toFixed(1)}%</div>
+            <div style={{ fontSize: 11, color: '#9CA3AF' }}>was €{m.revenuePrior.toFixed(0)}</div>
           </div>
+
+          {/* ROAS delta pill */}
           <div style={{ textAlign: 'right', minWidth: 72 }}>
             <span style={{
               display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 700,

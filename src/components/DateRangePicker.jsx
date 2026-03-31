@@ -48,10 +48,10 @@ function nextM(ym) {
 
 /* ─── component ─── */
 export default function DateRangePicker({ onApply, forcedPeriod }) {
-  const init = presetDates('7D')
+  const init = presetDates('30D')
   const [open,        setOpen]       = useState(false)
-  const [applied,     setApplied]    = useState({ preset: '7D', start: init.start, end: init.end })
-  const [preset,      setPreset]     = useState('7D')
+  const [applied,     setApplied]    = useState({ preset: '30D', start: init.start, end: init.end })
+  const [preset,      setPreset]     = useState('30D')
   const [tStart,      setTStart]     = useState(init.start)
   const [tEnd,        setTEnd]       = useState(init.end)
   const [hover,       setHover]      = useState(null)

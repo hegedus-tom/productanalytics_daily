@@ -67,18 +67,18 @@ export const budgetGroups = [
 // Top movers — week-over-week (Mar 23-29 vs Mar 16-22)
 export const topMovers = {
   gainers: [
-    { id: '416107_8_5', variants: null,  roasCurrent: 320.4, roasPrior: 148.2, delta: 172.2, spendL7: 68.4,  revenueL7: 219.1 },
-    { id: '466081_4',   variants: null,  roasCurrent: 281.3, roasPrior: 144.7, delta: 136.6, spendL7: 52.3,  revenueL7: 147.1 },
-    { id: '312445_xl',  variants: null,  roasCurrent: 245.8, roasPrior: 128.9, delta: 116.9, spendL7: 31.2,  revenueL7:  76.7 },
-    { id: '185234_m',   variants: null,  roasCurrent: 411.7, roasPrior: 309.5, delta: 102.2, spendL7: 24.8,  revenueL7: 102.1 },
-    { id: '090876_s',   variants: null,  roasCurrent: 348.9, roasPrior: 270.4, delta:  78.5, spendL7: 18.9,  revenueL7:  66.0 },
+    { id: '416107_8_5', name: 'Sneakers Hoka® W Clifton 10 Blush/ Rose Latte EUR 36',     roasCurrent: 320.4, roasPrior: 148.2, delta: 172.2, spendL7: 68.4,  revenueL7: 219.1, revenuePrior: 101.4 },
+    { id: '466081_4',   name: 'adidas Handball Spezial W Lucid Pink/ Almost Yellow',       roasCurrent: 281.3, roasPrior: 144.7, delta: 136.6, spendL7: 52.3,  revenueL7: 147.1, revenuePrior:  75.7 },
+    { id: '312445_xl',  name: 'Nike React Infinity Run Flyknit 3 Black/ White EUR 42',     roasCurrent: 245.8, roasPrior: 128.9, delta: 116.9, spendL7: 31.2,  revenueL7:  76.7, revenuePrior:  40.2 },
+    { id: '185234_m',   name: 'adidas Ultraboost 22 Core Black/ Carbon EUR 40',            roasCurrent: 411.7, roasPrior: 309.5, delta: 102.2, spendL7: 24.8,  revenueL7: 102.1, revenuePrior:  76.8 },
+    { id: '090876_s',   name: 'Puma RS-X Efekt Prism Violet/ Electric Peppermint EUR 37',  roasCurrent: 348.9, roasPrior: 270.4, delta:  78.5, spendL7: 18.9,  revenueL7:  66.0, revenuePrior:  51.1 },
   ],
   decliners: [
-    { id: '234789_l',   variants: null,  roasCurrent:  79.3, roasPrior: 312.8, delta: -233.5, spendL7: 87.5, revenueL7:  69.4 },
-    { id: '345012_m',   variants: null,  roasCurrent:  94.8, roasPrior: 279.1, delta: -184.3, spendL7: 63.2, revenueL7:  59.9 },
-    { id: '156789_xl',  variants: null,  roasCurrent: 109.6, roasPrior: 251.4, delta: -141.8, spendL7: 45.6, revenueL7:  50.0 },
-    { id: '278901_s',   variants: null,  roasCurrent: 132.0, roasPrior: 263.5, delta: -131.5, spendL7: 38.9, revenueL7:  51.4 },
-    { id: '401234_m',   variants: null,  roasCurrent: 145.2, roasPrior: 271.8, delta: -126.6, spendL7: 29.7, revenueL7:  43.1 },
+    { id: '234789_l',   name: 'Vans Old Skool Classic Marshmallow EUR 36',                 roasCurrent:  79.3, roasPrior: 312.8, delta: -233.5, spendL7: 87.5, revenueL7:  69.4, revenuePrior: 273.7 },
+    { id: '345012_m',   name: 'Reebok Club C 85 Chalk/ Paperwhite EUR 38',                 roasCurrent:  94.8, roasPrior: 279.1, delta: -184.3, spendL7: 63.2, revenueL7:  59.9, revenuePrior: 176.4 },
+    { id: '156789_xl',  name: 'Converse Chuck Taylor All Star Hi Egret EUR 40',            roasCurrent: 109.6, roasPrior: 251.4, delta: -141.8, spendL7: 45.6, revenueL7:  50.0, revenuePrior: 114.6 },
+    { id: '278901_s',   name: 'New Balance 327 Rain Cloud/ Sea Salt EUR 41',               roasCurrent: 132.0, roasPrior: 263.5, delta: -131.5, spendL7: 38.9, revenueL7:  51.4, revenuePrior: 102.5 },
+    { id: '401234_m',   name: 'Asics Gel-Kayano 31 Pale Mint/ Cream EUR 39',              roasCurrent: 145.2, roasPrior: 271.8, delta: -126.6, spendL7: 29.7, revenueL7:  43.1, revenuePrior:  80.7 },
   ],
 }
 

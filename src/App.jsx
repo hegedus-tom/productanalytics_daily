@@ -28,7 +28,7 @@ function DailyContent({ period, periodInfo, onInsightClick, tableRef, productTab
       <ProductCoverage />
       <hr className="divider" />
       {limited ? <TopMovers blurBody /> : <TopMovers />}
-      <DayOfWeekChart />
+      {limited ? <DayOfWeekChart blurBody /> : <DayOfWeekChart />}
       <div ref={tableRef}>
         <ProductTable
           activeTab={productTab}
@@ -45,7 +45,7 @@ function DailyContent({ period, periodInfo, onInsightClick, tableRef, productTab
 
 export default function App() {
   const [tab, setTab]               = useState('daily')
-  const [periodInfo, setPeriodInfo] = useState({ key: '7D', isCustom: false, start: null, end: null })
+  const [periodInfo, setPeriodInfo] = useState({ key: '30D', isCustom: false, start: null, end: null })
   const [productTab, setProductTab] = useState('all')
   const [savedViews, setSavedViews] = useState([])
   const [activeViewFilters, setActiveViewFilters] = useState(null)
