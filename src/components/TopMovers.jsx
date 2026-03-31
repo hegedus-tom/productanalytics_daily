@@ -19,7 +19,7 @@ function MoverTable({ movers, dir, onSelect }) {
           <div style={{ borderLeft: `3px solid ${dir === 'up' ? '#22C55E' : '#EF4444'}`, paddingLeft: 10 }}>
             <span
               onClick={() => onSelect(m.id)}
-              style={{ fontSize: 13, fontWeight: 600, color: '#6D28D9', fontFamily: 'monospace', cursor: 'pointer', textDecoration: 'underline', textDecorationStyle: 'dotted' }}
+              style={{ fontSize: 13, fontWeight: 600, color: '#6D28D9', fontFamily: 'monospace', cursor: 'pointer', textDecoration: 'none' }}
             >{m.id}</span>
           </div>
           <div style={{ textAlign: 'right' }}>
@@ -52,8 +52,8 @@ export default function TopMovers() {
     <div className="card section-wrap" style={{ marginBottom: 28 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div>
-          <div className="card-title">What changed this week</div>
-          <div className="card-subtitle">Biggest ROAS movers — last 7 days vs previous 7 days</div>
+          <div className="card-title">Biggest ROAS movers</div>
+          <div className="card-subtitle">What changed in the past week — last 7 days vs previous 7 days</div>
         </div>
         <span style={{ fontSize: 11, background: '#EDE9FE', color: '#6D28D9', padding: '3px 8px', borderRadius: 20, fontWeight: 600 }}>
           New with daily data

@@ -92,6 +92,9 @@ export default function PerformanceTrend({ period }) {
           <div className="card-subtitle">{cfg.subtitle}</div>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span style={{ fontSize: 11, background: '#EDE9FE', color: '#6D28D9', padding: '3px 8px', borderRadius: 20, fontWeight: 600 }}>
+            New with daily data
+          </span>
           {['roas', 'revenue', 'clicks'].map(m => (
             <button
               key={m}

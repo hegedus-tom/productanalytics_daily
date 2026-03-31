@@ -151,7 +151,7 @@ export default function ProductTable({ activeTab: externalTab, onTabChange }) {
     <>
     {modalId && <ProductModal productId={modalId} onClose={() => setModalId(null)} />}
     <div className="section-wrap" style={{ marginBottom: 28 }}>
-      <div className="section-title">Product analytics</div>
+      <div className="section-title">Product intelligence</div>
       <div className="section-subtitle">A complete analysis of your product portfolio, organized into key product segments.</div>
 
       <FilterBar filters={filters} onChange={setFilters} />
