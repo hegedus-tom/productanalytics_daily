@@ -11,14 +11,15 @@ import ProductTable from './components/ProductTable'
 import CurrentView from './views/CurrentView'
 import DateRangePicker from './components/DateRangePicker'
 import LimitedDateRangePicker from './components/LimitedDateRangePicker'
+import LockedSection from './components/LockedSection'
 
 const TABS = [
   { key: 'daily',   label: 'Daily',   badge: 'New ✦' },
-  { key: 'limited', label: 'Limited', badge: null },
+  { key: 'limited', label: 'Limited', badge: 'New ✦' },
   { key: 'current', label: 'Current', badge: null },
 ]
 
-function DailyContent({ period, onInsightClick, tableRef, productTab, setProductTab, onSaveView, activeViewFilters }) {
+function DailyContent({ period, onInsightClick, tableRef, productTab, setProductTab, onSaveView, activeViewFilters, limited }) {
   return (
     <>
       <KPISummary period={period} />
@@ -29,7 +30,7 @@ function DailyContent({ period, onInsightClick, tableRef, productTab, setProduct
       <hr className="divider" />
       <ProductCoverage />
       <hr className="divider" />
-      <TopMovers />
+      {limited ? <TopMovers blurBody /> : <TopMovers />}
       <DayOfWeekChart />
       <div ref={tableRef}>
         <ProductTable
@@ -157,6 +158,7 @@ export default function App() {
                 setProductTab={setProductTab}
                 onSaveView={handleSaveView}
                 activeViewFilters={activeViewFilters}
+                limited
               />
             )}
             {tab === 'current' && <CurrentView />}

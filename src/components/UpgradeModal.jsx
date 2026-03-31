@@ -48,7 +48,7 @@ export default function UpgradeModal({ onClose }) {
             Unlock historical data
           </div>
           <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6 }}>
-            You're currently on the <strong style={{ color: 'white' }}>Free plan</strong>, which includes last 7 days. Upgrade to access longer date ranges and make smarter decisions.
+            You're currently on the <strong style={{ color: 'white' }}>Basic plan</strong>, which includes last 7 days. Upgrade to access longer date ranges and make smarter decisions.
           </div>
         </div>
 
