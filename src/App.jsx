@@ -3,7 +3,6 @@ import Sidebar from './components/Sidebar'
 import KPISummary from './components/KPISummary'
 import PerformanceTrend from './components/PerformanceTrend'
 import PerformanceInsights from './components/PerformanceInsights'
-import ProductCatalogOverview from './components/ProductCatalogOverview'
 import DayOfWeekChart from './components/DayOfWeekChart'
 import ProductCoverage from './components/ProductCoverage'
 import TopMovers from './components/TopMovers'
@@ -25,8 +24,6 @@ function DailyContent({ period, periodInfo, onInsightClick, tableRef, productTab
       <KPISummary period={period} />
       <PerformanceInsights onInsightClick={onInsightClick} />
       <PerformanceTrend period={period} />
-      <hr className="divider" />
-      <ProductCatalogOverview />
       <hr className="divider" />
       <ProductCoverage />
       <hr className="divider" />

@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ResponsiveContainer } from 'recharts'
-import { budgetGroups } from '../data/mockData'
+import { budgetGroups, segments } from '../data/mockData'
 import HowToRead from './HowToRead'
 
 const PRODUCT_COLORS = ['#60A5FA', '#34D399', '#A78BFA']
@@ -114,6 +114,24 @@ export default function ProductCoverage() {
 
           <HowToRead text="This chart shows how much revenue each budget group generates. The top 10% spend group generating only 12.95% of revenue suggests room for reallocation." />
         </div>
+      </div>
+      {/* Catalog footnote */}
+      <div style={{
+        marginTop: 8, padding: '10px 16px', borderRadius: 8,
+        background: '#F9FAFB', border: '1px solid #F3F4F6',
+        display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center',
+      }}>
+        <span style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Feed context</span>
+        <span style={{ fontSize: 12, color: '#6B7280' }}>
+          <span style={{ fontWeight: 700, color: '#374151' }}>{segments.total.toLocaleString()}</span> total products in feed
+        </span>
+        <span style={{ fontSize: 12, color: '#6B7280' }}>
+          <span style={{ fontWeight: 700, color: '#15803D' }}>{segments.promotedPct}%</span> promoted ({segments.promoted.toLocaleString()} products)
+          <span style={{ color: '#9CA3AF', marginLeft: 6 }}>— industry avg for Shopping: 20–30%</span>
+        </span>
+        <span style={{ fontSize: 12, color: '#6B7280' }}>
+          <span style={{ fontWeight: 700, color: '#374151' }}>{segments.inactivePct}%</span> inactive — typical for large feeds; review in Product intelligence below
+        </span>
       </div>
     </div>
   )
