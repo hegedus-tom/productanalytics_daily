@@ -1,12 +1,26 @@
-import { useState } from 'react'
-import { reports } from '../data/mockData'
+import { useState, useRef, useEffect } from 'react'
+import { reports as initialReports } from '../data/mockData'
 import DeleteViewModal from './DeleteViewModal'
+import RenameReportModal from './RenameReportModal'
+import DeleteReportModal from './DeleteReportModal'
 
 const OP_LABEL = { gt: '>', lt: '<', eq: '=' }
 
 export default function Sidebar({ savedViews = [], onSelectView, onDeleteView }) {
-  const [hoveredView, setHoveredView] = useState(null)
-  const [deleteTarget, setDeleteTarget] = useState(null) // view to confirm delete
+  const [reports, setReports]           = useState(initialReports)
+  const [hoveredView, setHoveredView]   = useState(null)
+  const [deleteTarget, setDeleteTarget] = useState(null)   // saved view to delete
+  const [menuOpen, setMenuOpen]         = useState(null)   // report id with open dropdown
+  const [renameReport, setRenameReport] = useState(null)   // report to rename
+  const [deleteReport, setDeleteReport] = useState(null)   // report to delete
+  const menuRef = useRef(null)
+
+  // close dropdown on outside click
+  useEffect(() => {
+    const h = e => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(null) }
+    document.addEventListener('mousedown', h)
+    return () => document.removeEventListener('mousedown', h)
+  }, [])
 
   return (
     <>
@@ -15,6 +29,19 @@ export default function Sidebar({ savedViews = [], onSelectView, onDeleteView })
           viewName={deleteTarget.name}
           onConfirm={() => { onDeleteView?.(deleteTarget.id); setDeleteTarget(null) }}
           onClose={() => setDeleteTarget(null)}
+        />
+      )}
+      {renameReport && (
+        <RenameReportModal
+          currentName={renameReport.name}
+          onSave={name => setReports(prev => prev.map(r => r.id === renameReport.id ? { ...r, name } : r))}
+          onClose={() => setRenameReport(null)}
+        />
+      )}
+      {deleteReport && (
+        <DeleteReportModal
+          onConfirm={() => { setReports(prev => prev.filter(r => r.id !== deleteReport.id)); setDeleteReport(null) }}
+          onClose={() => setDeleteReport(null)}
         />
       )}
 
@@ -28,13 +55,68 @@ export default function Sidebar({ savedViews = [], onSelectView, onDeleteView })
           {reports.map(r => (
             <div key={r.id}>
               <div className={`report-item ${r.active ? 'active' : ''}`}>
-                <div>
+                <div style={{ minWidth: 0 }}>
                   <div className="report-item-name">{r.name}</div>
                   {r.dateRange && <div className="report-date">{r.dateRange}</div>}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, position: 'relative' }} ref={menuOpen === r.id ? menuRef : null}>
                   {r.alerts > 0 && <div className="report-alert">{r.alerts}</div>}
-                  <span style={{ fontSize: 16, color: '#D1D5DB', cursor: 'pointer' }}>···</span>
+
+                  {/* Three-dot button */}
+                  <span
+                    onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === r.id ? null : r.id) }}
+                    style={{ fontSize: 16, color: '#D1D5DB', cursor: 'pointer', padding: '2px 4px', borderRadius: 4, userSelect: 'none' }}
+                  >···</span>
+
+                  {/* Dropdown */}
+                  {menuOpen === r.id && (
+                    <div style={{
+                      position: 'absolute', top: '100%', right: 0, zIndex: 50,
+                      background: 'white', border: '1px solid #E5E7EB', borderRadius: 10,
+                      boxShadow: '0 6px 24px rgba(0,0,0,0.12)', minWidth: 148, padding: '4px 0',
+                    }}>
+                      {/* Rename */}
+                      <button
+                        onClick={() => { setRenameReport(r); setMenuOpen(null) }}
+                        style={{
+                          width: '100%', padding: '10px 14px', border: 'none', background: 'none',
+                          display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer',
+                          fontSize: 13, fontWeight: 500, color: '#374151', fontFamily: 'inherit',
+                          textAlign: 'left',
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = '#F9FAFB'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                        Rename
+                      </button>
+
+                      <div style={{ height: 1, background: '#F3F4F6', margin: '2px 0' }} />
+
+                      {/* Delete */}
+                      <button
+                        onClick={() => { setDeleteReport(r); setMenuOpen(null) }}
+                        style={{
+                          width: '100%', padding: '10px 14px', border: 'none', background: 'none',
+                          display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer',
+                          fontSize: 13, fontWeight: 500, color: '#DC2626', fontFamily: 'inherit',
+                          textAlign: 'left',
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = '#FEF2F2'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                          <path d="M10 11v6"/><path d="M14 11v6"/>
+                          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                        </svg>
+                        Delete
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -67,8 +149,6 @@ export default function Sidebar({ savedViews = [], onSelectView, onDeleteView })
                             {v.name}
                           </span>
                         </div>
-
-                        {/* Delete button — visible on hover */}
                         {hoveredView === v.id && (
                           <button
                             onClick={e => { e.stopPropagation(); setDeleteTarget(v) }}
@@ -81,13 +161,9 @@ export default function Sidebar({ savedViews = [], onSelectView, onDeleteView })
                           >×</button>
                         )}
                       </div>
-
                       <div style={{ display: 'flex', gap: 4, marginTop: 4, flexWrap: 'wrap', paddingLeft: 17 }}>
                         {v.filters.map(f => (
-                          <span key={f.key} style={{
-                            fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 20,
-                            background: '#EDE9FE', color: '#6D28D9',
-                          }}>
+                          <span key={f.key} style={{ fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 20, background: '#EDE9FE', color: '#6D28D9' }}>
                             {f.label} {OP_LABEL[f.op]} {f.value}
                           </span>
                         ))}
