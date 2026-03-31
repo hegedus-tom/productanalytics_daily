@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { productList, segments } from '../data/mockData'
+import FilterBar from './FilterBar'
 
 function fmt(n) { return '€' + n.toLocaleString('en-EU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
 function fmtPct(n) { return n.toFixed(2) + '%' }
@@ -36,16 +37,26 @@ export default function ProductTable({ activeTab: externalTab, onTabChange }) {
   const [internalTab, setInternalTab] = useState('all')
   const activeTab = externalTab ?? internalTab
   function setActiveTab(t) { setInternalTab(t); onTabChange?.(t) }
-  const [search, setSearch] = useState('')
+  const [search, setSearch]   = useState('')
+  const [filters, setFilters] = useState([])
 
   const ov = OVERVIEW[activeTab]
   const rawRows = productList[activeTab] || productList.all
-  const rows = rawRows.filter(r => r.id.toLowerCase().includes(search.toLowerCase()))
+  const rows = rawRows
+    .filter(r => r.id.toLowerCase().includes(search.toLowerCase()))
+    .filter(r => filters.every(f => {
+      const val = r[f.dataKey] ?? 0
+      if (f.op === 'lt') return val < f.value
+      if (f.op === 'gt') return val > f.value
+      return val === f.value
+    }))
 
   return (
     <div className="section-wrap" style={{ marginBottom: 28 }}>
       <div className="section-title">Product analytics</div>
       <div className="section-subtitle">A complete analysis of your product portfolio, organized into key product segments.</div>
+
+      <FilterBar filters={filters} onChange={setFilters} />
 
       <div className="tabs">
         {TABS.map(t => (
