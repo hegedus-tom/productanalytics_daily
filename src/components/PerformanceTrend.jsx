@@ -1,12 +1,21 @@
 import { useState } from 'react'
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, ReferenceLine, ResponsiveContainer, Legend
+  Tooltip, ReferenceLine, ResponsiveContainer,
 } from 'recharts'
 import { dailyStats } from '../data/mockData'
 import HowToRead from './HowToRead'
 
 const AVG_ROAS = 228
+
+// 7-day rolling average
+function withRollingAvg(data) {
+  return data.map((d, i) => {
+    const window = data.slice(Math.max(0, i - 6), i + 1).filter(x => x.roas != null && !x.partial)
+    const avg = window.length ? window.reduce((s, x) => s + x.roas, 0) / window.length : null
+    return { ...d, roasAvg: avg != null ? parseFloat(avg.toFixed(1)) : null }
+  })
+}
 
 function CustomDot(props) {
   const { cx, cy, payload } = props
@@ -15,117 +24,122 @@ function CustomDot(props) {
   return <circle cx={cx} cy={cy} r={5} fill={color} stroke="white" strokeWidth={2} />
 }
 
-function CustomTooltip({ active, payload, label }) {
+function CustomTooltip({ active, payload }) {
   if (!active || !payload?.length) return null
   const d = payload[0]?.payload
+  if (!d) return null
+
+  const roasAvgEntry = payload.find(p => p.dataKey === 'roasAvg')
+
   return (
     <div className="ct">
-      <div className="ct-date">{d?.date} ({d?.dow})</div>
+      <div className="ct-date">{d.date} ({d.dow})</div>
       <div className="ct-row">
         <span className="ct-label">Spend</span>
-        <span className="ct-val">€{d?.spend?.toFixed(2)}</span>
+        <span className="ct-val">€{d.spend?.toFixed(2)}</span>
       </div>
       <div className="ct-row">
         <span className="ct-label">Revenue</span>
-        <span className="ct-val">€{d?.revenue?.toFixed(2)}</span>
+        <span className="ct-val">€{d.revenue?.toFixed(2)}</span>
       </div>
       <div className="ct-row">
         <span className="ct-label">ROAS</span>
-        <span className="ct-val" style={{ color: d?.roas < 100 ? '#DC2626' : d?.roas > 300 ? '#15803D' : '#111827' }}>
-          {d?.roas != null ? d.roas.toFixed(1) + '%' : '–'}
+        <span className="ct-val" style={{ color: d.roas < 100 ? '#DC2626' : d.roas > 300 ? '#15803D' : '#111827', fontWeight: 700 }}>
+          {d.roas != null ? d.roas.toFixed(1) + '%' : '–'}
         </span>
       </div>
+      {roasAvgEntry?.value != null && (
+        <div className="ct-row">
+          <span className="ct-label">7-day avg ROAS</span>
+          <span className="ct-val" style={{ color: '#7C3AED' }}>{roasAvgEntry.value.toFixed(1)}%</span>
+        </div>
+      )}
       <div className="ct-row">
         <span className="ct-label">Clicks</span>
-        <span className="ct-val">{d?.clicks?.toLocaleString()}</span>
+        <span className="ct-val">{d.clicks?.toLocaleString()}</span>
       </div>
-      <div className="ct-row">
-        <span className="ct-label">Active products</span>
-        <span className="ct-val">{d?.activeProducts?.toLocaleString()}</span>
-      </div>
-      {d?.anomaly === 'low'     && <div className="ct-anomaly">⚠ ROAS below normal — check budget allocation</div>}
-      {d?.anomaly === 'high'    && <div className="ct-anomaly" style={{ color: '#15803D' }}>★ Unusually strong ROAS day</div>}
-      {d?.anomaly === 'partial' && <div className="ct-anomaly" style={{ color: '#92400E' }}>⏳ Partial day — data still syncing</div>}
+      {d.anomaly === 'low'     && <div className="ct-anomaly">⚠ ROAS below normal — check product segments</div>}
+      {d.anomaly === 'high'    && <div className="ct-anomaly" style={{ color: '#15803D' }}>★ Unusually strong ROAS day</div>}
+      {d.anomaly === 'partial' && <div className="ct-anomaly" style={{ color: '#92400E' }}>⏳ Partial day — data still syncing</div>}
     </div>
   )
 }
 
-const METRIC_CONFIG = {
-  roas: {
-    subtitle:   'Daily spend vs ROAS — see how your return on ad spend is trending',
-    howToRead:  'Bars show how much you spent each day. The purple line shows your ROAS — the higher, the better. Red dots = days your ROAS was dangerously low. Green dots = exceptional days. The dashed line at 100% is break-even: below it, you\'re losing money.',
-    lineLabel:  'ROAS (%)',
-    lineColor:  '#7C3AED',
-  },
-  revenue: {
-    subtitle:   'Daily spend vs revenue — see how much your ads are generating',
-    howToRead:  'Bars show how much you spent each day. The blue line shows your daily revenue. When the revenue line is far above the bars, your ads are generating strong returns. A narrowing gap may signal declining efficiency.',
-    lineLabel:  'Revenue (€)',
-    lineColor:  '#0EA5E9',
-  },
-  clicks: {
-    subtitle:   'Daily spend vs clicks — see how much traffic your ads are driving',
-    howToRead:  'Bars show daily spend. The amber line shows how many clicks your ads received each day. Compare spend to clicks to spot days where you paid more per click — a sign of rising competition or worsening quality scores.',
-    lineLabel:  'Clicks',
-    lineColor:  '#F59E0B',
-  },
-}
+const OVERLAYS = [
+  { key: 'revenue', label: 'Revenue',   color: '#0EA5E9' },
+  { key: 'clicks',  label: 'Clicks',    color: '#F59E0B' },
+]
 
 export default function PerformanceTrend({ period }) {
-  const [metric, setMetric] = useState('roas')
-  const cfg = METRIC_CONFIG[metric]
+  const [active, setActive] = useState(new Set()) // which overlays are on
 
-  const valid = dailyStats.filter(d => !d.partial)
+  function toggleOverlay(key) {
+    setActive(prev => {
+      const next = new Set(prev)
+      next.has(key) ? next.delete(key) : next.add(key)
+      return next
+    })
+  }
+
+  const valid  = dailyStats.filter(d => !d.partial)
   const sliced = period === '7D' ? valid.slice(-7) : period === '14D' ? valid.slice(-14) : valid
-
-  // include partial day at end for 30D so the chart shows it grayed
-  const data = period === '30D' ? [...sliced, dailyStats[dailyStats.length - 1]] : sliced
+  const withPartial = period === '30D' ? [...sliced, dailyStats[dailyStats.length - 1]] : sliced
+  const data   = withRollingAvg(withPartial)
 
   const anomalyDays = data.filter(d => d.anomaly === 'low')
-  const hasLow = anomalyDays.length > 0
+  const showRevenue = active.has('revenue')
+  const showClicks  = active.has('clicks')
 
   return (
     <div className="card section-wrap" style={{ marginBottom: 28 }}>
+      {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
         <div>
           <div className="card-title">Performance over time</div>
-          <div className="card-subtitle">{cfg.subtitle}</div>
+          <div className="card-subtitle">
+            Daily spend, ROAS and 7-day rolling average — add overlays to correlate metrics
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <span style={{ fontSize: 11, background: '#EDE9FE', color: '#6D28D9', padding: '3px 8px', borderRadius: 20, fontWeight: 600 }}>
             New with daily data
           </span>
-          {['roas', 'revenue', 'clicks'].map(m => (
+          <span style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 500 }}>Overlay:</span>
+          {OVERLAYS.map(o => (
             <button
-              key={m}
-              onClick={() => setMetric(m)}
+              key={o.key}
+              onClick={() => toggleOverlay(o.key)}
               style={{
-                padding: '5px 12px', borderRadius: 6, border: '1px solid #E5E7EB',
-                background: metric === m ? '#6D28D9' : 'white',
-                color: metric === m ? 'white' : '#6B7280',
-                fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit'
+                padding: '5px 12px', borderRadius: 6,
+                border: `1.5px solid ${active.has(o.key) ? o.color : '#E5E7EB'}`,
+                background: active.has(o.key) ? o.color + '15' : 'white',
+                color: active.has(o.key) ? o.color : '#6B7280',
+                fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                display: 'flex', alignItems: 'center', gap: 5,
               }}
             >
-              {m === 'roas' ? 'ROAS' : m === 'revenue' ? 'Revenue' : 'Clicks'}
+              {active.has(o.key) && <span style={{ fontSize: 10 }}>✓</span>}
+              {o.label}
             </button>
           ))}
         </div>
       </div>
 
-      {hasLow && (
+      {/* Anomaly banner */}
+      {anomalyDays.length > 0 && (
         <div className="anomaly-banner">
           <span>⚠</span>
           <span>
             <b>Low ROAS detected</b> on {anomalyDays.map(d => d.dateShort).join(', ')}.
-            Budget was spent but returns were below break-even. Check product segments below.
+            Spend was active but returns were below break-even. Review product segments below.
           </span>
         </div>
       )}
 
-      <HowToRead text={cfg.howToRead} />
+      <HowToRead text="Spend bars show daily budget. The purple line is daily ROAS — the dashed line smooths it to a 7-day average so you can separate real trends from daily noise. Red/green dots flag outlier days. Toggle Revenue or Clicks to see how they move together with ROAS." />
 
       <ResponsiveContainer width="100%" height={300}>
-        <ComposedChart data={data} margin={{ top: 10, right: 55, left: 10, bottom: 0 }}>
+        <ComposedChart data={data} margin={{ top: 10, right: 60, left: 10, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" vertical={false} />
           <XAxis
             dataKey="dateShort"
@@ -133,6 +147,7 @@ export default function PerformanceTrend({ period }) {
             axisLine={false} tickLine={false}
             interval={period === '30D' ? 4 : period === '14D' ? 1 : 0}
           />
+          {/* Left Y: spend + revenue */}
           <YAxis
             yAxisId="left"
             tickFormatter={v => `€${v}`}
@@ -140,105 +155,96 @@ export default function PerformanceTrend({ period }) {
             axisLine={false} tickLine={false}
             width={55}
           />
+          {/* Right Y: ROAS % + clicks */}
           <YAxis
             yAxisId="right"
             orientation="right"
-            tickFormatter={v => metric === 'clicks' ? v.toLocaleString() : `${v}%`}
+            tickFormatter={v => showClicks && !showRevenue ? v.toLocaleString() : `${v}%`}
             tick={{ fontSize: 11, fill: '#9CA3AF' }}
             axisLine={false} tickLine={false}
             width={50}
           />
+
           <Tooltip content={<CustomTooltip />} />
-          {metric === 'roas' && <>
-            <ReferenceLine
-              yAxisId="right" y={100}
-              stroke="#FCA5A5" strokeDasharray="5 4" strokeWidth={1.5}
-              label={{ value: 'Break-even', position: 'right', fill: '#EF4444', fontSize: 10 }}
-            />
-            <ReferenceLine
-              yAxisId="right" y={AVG_ROAS}
-              stroke="#C4B5FD" strokeDasharray="5 4" strokeWidth={1.5}
-              label={{ value: 'Avg ROAS', position: 'right', fill: '#7C3AED', fontSize: 10 }}
-            />
-          </>}
-          <Bar
-            yAxisId="left"
-            dataKey="spend"
-            fill="#DDD6FE"
-            radius={[3, 3, 0, 0]}
-            name="Spend (€)"
-            maxBarSize={28}
-          />
-          {metric === 'roas' && (
-            <Line
-              yAxisId="right"
-              type="monotone"
-              dataKey="roas"
-              stroke="#7C3AED"
-              strokeWidth={2.5}
-              dot={<CustomDot />}
-              activeDot={{ r: 5, fill: '#7C3AED' }}
-              connectNulls={false}
-              name="ROAS (%)"
-            />
+
+          {/* Reference lines */}
+          <ReferenceLine yAxisId="right" y={100}
+            stroke="#FCA5A5" strokeDasharray="5 4" strokeWidth={1.5}
+            label={{ value: 'Break-even', position: 'right', fill: '#EF4444', fontSize: 10 }} />
+          <ReferenceLine yAxisId="right" y={AVG_ROAS}
+            stroke="#C4B5FD" strokeDasharray="5 4" strokeWidth={1.5}
+            label={{ value: 'Avg ROAS', position: 'right', fill: '#7C3AED', fontSize: 10 }} />
+
+          {/* Spend bars — always */}
+          <Bar yAxisId="left" dataKey="spend" fill="#DDD6FE" radius={[3, 3, 0, 0]} name="Spend (€)" maxBarSize={28} />
+
+          {/* Revenue overlay */}
+          {showRevenue && (
+            <Line yAxisId="left" type="monotone" dataKey="revenue"
+              stroke="#0EA5E9" strokeWidth={2} dot={false} activeDot={{ r: 4 }} name="Revenue (€)" />
           )}
-          {metric === 'revenue' && (
-            <Line
-              yAxisId="left"
-              type="monotone"
-              dataKey="revenue"
-              stroke="#0EA5E9"
-              strokeWidth={2.5}
-              dot={false}
-              activeDot={{ r: 5 }}
-              name="Revenue (€)"
-            />
+
+          {/* Clicks overlay */}
+          {showClicks && (
+            <Line yAxisId="right" type="monotone" dataKey="clicks"
+              stroke="#F59E0B" strokeWidth={2} dot={false} activeDot={{ r: 4 }} name="Clicks" />
           )}
-          {metric === 'clicks' && (
-            <Line
-              yAxisId="right"
-              type="monotone"
-              dataKey="clicks"
-              stroke="#F59E0B"
-              strokeWidth={2.5}
-              dot={false}
-              activeDot={{ r: 5 }}
-              name="Clicks"
-            />
-          )}
+
+          {/* ROAS line — always */}
+          <Line yAxisId="right" type="monotone" dataKey="roas"
+            stroke="#7C3AED" strokeWidth={2.5}
+            dot={<CustomDot />} activeDot={{ r: 5, fill: '#7C3AED' }}
+            connectNulls={false} name="ROAS (%)" />
+
+          {/* 7-day rolling average — always */}
+          <Line yAxisId="right" type="monotone" dataKey="roasAvg"
+            stroke="#7C3AED" strokeWidth={1.5} strokeDasharray="6 3"
+            dot={false} activeDot={false} name="7-day avg ROAS" connectNulls />
         </ComposedChart>
       </ResponsiveContainer>
 
-      <div style={{ display: 'flex', gap: 20, marginTop: 12, fontSize: 11, color: '#9CA3AF', flexWrap: 'wrap' }}>
-        {/* Always shown */}
+      {/* Legend */}
+      <div style={{ display: 'flex', gap: 20, marginTop: 12, fontSize: 11, color: '#9CA3AF', flexWrap: 'wrap', alignItems: 'center' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <span style={{ width: 14, height: 10, borderRadius: 2, background: '#DDD6FE', display: 'inline-block' }} />
           Daily spend
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span style={{ width: 28, height: 2, background: cfg.lineColor, display: 'inline-block', borderRadius: 2 }} />
-          {cfg.lineLabel}
+          <span style={{ width: 28, height: 2.5, background: '#7C3AED', display: 'inline-block', borderRadius: 2 }} />
+          ROAS
         </span>
-
-        {/* ROAS-only items */}
-        {metric === 'roas' && <>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ width: 28, height: 0, borderTop: '2px dashed #7C3AED', display: 'inline-block' }} />
+          7-day avg ROAS
+        </span>
+        {showRevenue && (
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#DC2626', display: 'inline-block' }} />
-            Low ROAS day
+            <span style={{ width: 28, height: 2, background: '#0EA5E9', display: 'inline-block', borderRadius: 2 }} />
+            Revenue
           </span>
+        )}
+        {showClicks && (
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#16A34A', display: 'inline-block' }} />
-            High ROAS day
+            <span style={{ width: 28, height: 2, background: '#F59E0B', display: 'inline-block', borderRadius: 2 }} />
+            Clicks
           </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ width: 28, height: 2, background: '#FCA5A5', display: 'inline-block' }} />
-            Break-even (100%)
-          </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ width: 28, height: 2, background: '#C4B5FD', display: 'inline-block' }} />
-            Avg ROAS ({AVG_ROAS}%)
-          </span>
-        </>}
+        )}
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#DC2626', display: 'inline-block' }} />
+          Low ROAS day
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ width: 12, height: 12, borderRadius: '50%', background: '#16A34A', display: 'inline-block' }} />
+          High ROAS day
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ width: 28, height: 2, background: '#FCA5A5', display: 'inline-block' }} />
+          Break-even (100%)
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ width: 28, height: 2, background: '#C4B5FD', display: 'inline-block' }} />
+          Avg ROAS ({AVG_ROAS}%)
+        </span>
       </div>
     </div>
   )
