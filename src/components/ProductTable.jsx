@@ -6,12 +6,12 @@ function fmt(n) { return '€' + n.toLocaleString('en-EU', { minimumFractionDigi
 function fmtPct(n) { return n.toFixed(2) + '%' }
 
 const TABS = [
-  { key: 'all',            label: 'All products',    count: segments.total,        alert: false },
-  { key: 'losers',         label: 'Losers',           count: segments.losers,       alert: true },
-  { key: 'underperformers',label: 'Underperformers',  count: segments.underperformers, alert: true },
-  { key: 'budgetSpenders', label: 'Budget spenders',  count: segments.budgetSpenders,  alert: true },
-  { key: 'active',         label: 'Active products',  count: segments.active,       alert: true },
-  { key: 'inactive',       label: 'Inactive products',count: segments.inactive,     alert: false },
+  { key: 'all',            label: 'All products',    count: segments.total,           alert: false },
+  { key: 'losers',         label: 'Losers',           count: segments.losers,          alert: true  },
+  { key: 'underperformers',label: 'Underperformers',  count: segments.underperformers, alert: true  },
+  { key: 'budgetSpenders', label: 'Budget spenders',  count: segments.budgetSpenders,  alert: true  },
+  { key: 'active',         label: 'Active products',  count: segments.active,          alert: true  },
+  { key: 'inactive',       label: 'Inactive products',count: segments.inactive,        alert: false },
 ]
 
 const OVERVIEW = {
@@ -23,13 +23,83 @@ const OVERVIEW = {
   inactive:       { products: segments.inactive,        spend:      0,   revenue:      0,   roas:   null },
 }
 
+const TAB_ALERT = {
+  losers: {
+    tag: 'Where you\'re losing money',
+    value: '€4,155.14',
+    body: '<b>26.99%</b> of the total budget has been spent on products with <b>ROAS lower than 100%</b>. This money goes into promotion of <b>509 products</b> (<b>8.12%</b> of the promoted products). These products are generating <b>ROAS 11.60%</b>. This money can be reallocated to better products.',
+  },
+  underperformers: {
+    tag: 'Spend on low-ROAS products',
+    value: '€5,904.87',
+    body: '<b>38.36%</b> of the total budget has been invested in products with <b>ROAS lower than 210.73%</b>. This budget goes into promotion of <b>554 products</b> (<b>8.84%</b> of the promoted products). These products are generating <b>ROAS 53.25%</b>. This money can be reallocated to better products.',
+  },
+  budgetSpenders: {
+    tag: 'Spend concentration',
+    value: '0.14%',
+    body: '<b>0.14%</b> of all promoted products (<b>9 products</b>) used <b>10%</b> of the total budget.',
+  },
+  active: {
+    tag: 'Active products',
+    value: '12.60%',
+    body: '<b>12.60%</b> of promoted products (<b>790 products</b>) has more than <b>10 clicks</b> in the last 30 days. These products used <b>68.23% of the budget</b>.',
+  },
+}
+
+const TAB_INFO = {
+  losers: {
+    title: 'What are "Loser" products?',
+    body: 'Losers are products that generate less revenue than the amount spent on advertising. This means they don\'t even cover their ad costs. These products should be considered for exclusion or their budgets should be significantly reduced.',
+  },
+  underperformers: {
+    title: 'What are "Underperformer" products?',
+    body: 'A product is considered underperforming when it has received sufficient testing (e.g., more than xy clicks) but fails to meet the minimum ROAS target. These products are an ideal segment for future optimization.',
+  },
+  budgetSpenders: {
+    title: 'What are "Budget Spenders"?',
+    body: 'Budget Spenders are products that take the largest share of your advertising budget. While they may drive revenue, relying on a small group creates risk if they drop out and leaves little budget for other products to prove their potential.',
+  },
+  active: {
+    title: 'What are "Active" products?',
+    body: 'Really active products are those that the algorithms have tested (e.g., received more than 10 clicks) and are currently displayed in campaigns. Ideally, your entire portfolio should be promoted. If some products are missing, the algorithms have skipped them.',
+  },
+}
+
+// Column definitions: key = data field, string = locale-compare, number = numeric sort
+const COLS = [
+  { key: 'id',          label: 'Product group ID', type: 'string', gads: false },
+  { key: 'name',        label: 'Name',             type: 'string', gads: false },
+  { key: 'spend',       label: 'Spend',            type: 'number', gads: true  },
+  { key: 'roas',        label: 'ROAS',             type: 'number', gads: true  },
+  { key: 'conversions', label: 'Conversions',      type: 'number', gads: true  },
+  { key: 'convValue',   label: 'Conv. Value',      type: 'number', gads: true  },
+  { key: 'clicks',      label: 'Clicks',           type: 'number', gads: true  },
+  { key: 'impressions', label: 'Impressions',      type: 'number', gads: true  },
+]
+
 function GadsIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" style={{ marginRight: 3 }}>
-      <path d="M2.5 19.5L9 8.5l4.5 7.8-2 3.2H2.5z" fill="#4285F4"/>
-      <path d="M14.5 19.5L21 8.5l-4.5-7.8-8 13.9 2 4.9z" fill="#FBBC04"/>
-      <circle cx="21" cy="8.5" r="3" fill="#34A853"/>
+    <svg width="14" height="14" viewBox="0 0 192 192" style={{ marginRight: 3, flexShrink: 0 }}>
+      {/* Blue left bar */}
+      <path d="M32 160 L96 32 L96 112 L64 160 Z" fill="#4285F4"/>
+      {/* Yellow right bar */}
+      <path d="M96 32 L160 160 L128 160 L96 112 Z" fill="#FBBC04"/>
+      {/* Green circle — top right */}
+      <circle cx="160" cy="32" r="32" fill="#34A853"/>
     </svg>
+  )
+}
+
+function SortArrow({ col, sortCol, sortDir }) {
+  const active = sortCol === col
+  return (
+    <span style={{
+      marginLeft: 4, fontSize: 11, lineHeight: 1,
+      color: active ? '#6D28D9' : '#D1D5DB',
+      transition: 'color 0.15s',
+    }}>
+      {active && sortDir === 'desc' ? '↓' : '↑'}
+    </span>
   )
 }
 
@@ -37,11 +107,24 @@ export default function ProductTable({ activeTab: externalTab, onTabChange }) {
   const [internalTab, setInternalTab] = useState('all')
   const activeTab = externalTab ?? internalTab
   function setActiveTab(t) { setInternalTab(t); onTabChange?.(t) }
-  const [search, setSearch]   = useState('')
+
+  const [search,  setSearch]  = useState('')
   const [filters, setFilters] = useState([])
+  const [sortCol, setSortCol] = useState(null)   // col key
+  const [sortDir, setSortDir] = useState('asc')  // 'asc' | 'desc'
+
+  function handleSort(colKey) {
+    if (sortCol === colKey) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortCol(colKey)
+      setSortDir('asc')
+    }
+  }
 
   const ov = OVERVIEW[activeTab]
   const rawRows = productList[activeTab] || productList.all
+
   const rows = rawRows
     .filter(r => r.id.toLowerCase().includes(search.toLowerCase()))
     .filter(r => filters.every(f => {
@@ -50,6 +133,17 @@ export default function ProductTable({ activeTab: externalTab, onTabChange }) {
       if (f.op === 'gt') return val > f.value
       return val === f.value
     }))
+    .slice()
+    .sort((a, b) => {
+      if (!sortCol) return 0
+      const col = COLS.find(c => c.key === sortCol)
+      const av = a[sortCol] ?? ''
+      const bv = b[sortCol] ?? ''
+      let cmp = col?.type === 'string'
+        ? String(av).localeCompare(String(bv))
+        : (av - bv)
+      return sortDir === 'asc' ? cmp : -cmp
+    })
 
   return (
     <div className="section-wrap" style={{ marginBottom: 28 }}>
@@ -73,6 +167,53 @@ export default function ProductTable({ activeTab: externalTab, onTabChange }) {
           </div>
         ))}
       </div>
+
+      {/* Tab info box */}
+      {TAB_INFO[activeTab] && (
+        <div style={{
+          background: '#F5F3FF', border: '1px solid #DDD6FE', borderRadius: 10,
+          padding: '14px 18px', marginBottom: 12,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <span style={{ fontSize: 14 }}>💬</span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: '#6D28D9' }}>{TAB_INFO[activeTab].title}</span>
+          </div>
+          <p style={{ fontSize: 13, color: '#4C1D95', lineHeight: 1.65, margin: 0 }}>
+            {TAB_INFO[activeTab].body}
+          </p>
+        </div>
+      )}
+
+      {/* Key alert box */}
+      {TAB_ALERT[activeTab] && (
+        <div style={{
+          background: '#FEF9F9', border: '1px solid #FECACA', borderRadius: 10,
+          padding: '14px 18px', marginBottom: 16,
+        }}>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+            <span style={{ fontSize: 15 }}>🔴</span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: '#DC2626' }}>Key alerts</span>
+          </div>
+          <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 12, marginLeft: 22 }}>
+            Insights requiring your attention.
+          </div>
+          {/* Insight card */}
+          <div style={{ background: 'white', border: '1px solid #FECACA', borderRadius: 8, padding: '14px 16px' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#B45309', marginBottom: 8 }}>
+              {TAB_ALERT[activeTab].tag}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
+              <span style={{ fontSize: 26, fontWeight: 800, color: '#DC2626', flexShrink: 0 }}>
+                {TAB_ALERT[activeTab].value}
+              </span>
+              <span style={{ fontSize: 13, color: '#374151', lineHeight: 1.65 }}
+                dangerouslySetInnerHTML={{ __html: TAB_ALERT[activeTab].body }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Overview row */}
       <div className="overview-row" style={{ marginBottom: 20, background: 'white' }}>
@@ -109,9 +250,7 @@ export default function ProductTable({ activeTab: externalTab, onTabChange }) {
           </div>
           <div className="overview-stat-sub">
             {activeTab === 'all' ? '1x equal the average ROAS' :
-             ov.roas != null
-               ? `${(ov.roas / 210.73).toFixed(2)}x the account average`
-               : 'No revenue data'}
+             ov.roas != null ? `${(ov.roas / 210.73).toFixed(2)}x the account average` : 'No revenue data'}
           </div>
         </div>
       </div>
@@ -122,7 +261,6 @@ export default function ProductTable({ activeTab: externalTab, onTabChange }) {
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
         <input
-          className=""
           placeholder="Search by product ID..."
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -136,14 +274,19 @@ export default function ProductTable({ activeTab: externalTab, onTabChange }) {
           <table className="product-table">
             <thead>
               <tr>
-                <th>Product group ID ↑</th>
-                <th>Name ↑</th>
-                <th className="sortable"><span className="badge-gads"><GadsIcon />Spend ↑</span></th>
-                <th className="sortable"><span className="badge-gads"><GadsIcon />ROAS ↑</span></th>
-                <th className="sortable"><span className="badge-gads"><GadsIcon />Conversions ↑</span></th>
-                <th className="sortable"><span className="badge-gads"><GadsIcon />Conv. Value ↑</span></th>
-                <th className="sortable"><span className="badge-gads"><GadsIcon />Clicks ↑</span></th>
-                <th className="sortable"><span className="badge-gads"><GadsIcon />Impressions ↑</span></th>
+                {COLS.map(col => (
+                  <th
+                    key={col.key}
+                    onClick={() => handleSort(col.key)}
+                    style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
+                  >
+                    <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      {col.gads && <GadsIcon />}
+                      {col.label}
+                      <SortArrow col={col.key} sortCol={sortCol} sortDir={sortDir} />
+                    </span>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>

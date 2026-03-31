@@ -5,7 +5,6 @@ const MONTHS_S    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'
 const DOW         = ['Mo','Tu','We','Th','Fr','Sa','Su']
 const TODAY       = new Date(2026, 2, 31) // 31 Mar 2026
 
-const STRIPE = 'repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(0,0,0,0.05) 3px,rgba(0,0,0,0.05) 6px)'
 
 const PRESETS = [
   { label: 'Last 7 days',  key: '7D'  },
@@ -49,10 +48,10 @@ function nextM(ym) {
 
 /* ─── component ─── */
 export default function DateRangePicker({ onApply }) {
-  const init = presetDates('30D')
+  const init = presetDates('7D')
   const [open,        setOpen]       = useState(false)
-  const [applied,     setApplied]    = useState({ preset: '30D', start: init.start, end: init.end })
-  const [preset,      setPreset]     = useState('30D')
+  const [applied,     setApplied]    = useState({ preset: '7D', start: init.start, end: init.end })
+  const [preset,      setPreset]     = useState('7D')
   const [tStart,      setTStart]     = useState(init.start)
   const [tEnd,        setTEnd]       = useState(init.end)
   const [hover,       setHover]      = useState(null)
@@ -128,7 +127,7 @@ export default function DateRangePicker({ onApply }) {
             <div key={d} style={{
               textAlign: 'center', fontSize: 11, fontWeight: 700, color: '#6B7280',
               padding: '4px 0 8px',
-              background: i >= 5 ? STRIPE : 'transparent',
+              background: 'transparent',
             }}>{d}</div>
           ))}
 
@@ -164,7 +163,7 @@ export default function DateRangePicker({ onApply }) {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   margin: '0 auto',
                   borderRadius: isEdge ? 7 : 0,
-                  background: isEdge ? '#6D28D9' : (!isEdge && isWknd && !inRange) ? STRIPE : 'transparent',
+                  background: isEdge ? '#6D28D9' : 'transparent',
                   color: isEdge ? 'white'
                        : inRange ? '#6D28D9'
                        : !cur    ? '#D1D5DB'
@@ -201,12 +200,6 @@ export default function DateRangePicker({ onApply }) {
           <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
         </svg>
         <span>{btnLabel}</span>
-        {open && (
-          <span
-            onClick={e => { e.stopPropagation(); setOpen(false) }}
-            style={{ color: '#9CA3AF', fontSize: 11, lineHeight: 1, cursor: 'pointer' }}
-          >✕</span>
-        )}
         <span style={{ color: '#9CA3AF', fontSize: 10 }}>{open ? '▲' : '▼'}</span>
       </button>
 

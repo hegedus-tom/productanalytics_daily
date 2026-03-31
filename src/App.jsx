@@ -13,7 +13,7 @@ import DateRangePicker from './components/DateRangePicker'
 
 export default function App() {
   const [tab, setTab]           = useState('daily')
-  const [period, setPeriod]     = useState('30D')
+  const [period, setPeriod]     = useState('7D')
   const [productTab, setProductTab] = useState('all')
   const tableRef = useRef(null)
 
