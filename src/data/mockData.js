@@ -112,11 +112,5 @@ export const productList = {
 
 // Reports list for sidebar
 export const reports = [
-  { id: 1, name: 'My report', alerts: 0 },
   { id: 2, name: 'Daily grouped report Footshop SE', alerts: 4, active: true },
-  { id: 3, name: 'Argjend Report Gads per centage', alerts: 0 },
-  { id: 4, name: 'Argjend Report GAds', alerts: 0 },
-  { id: 5, name: 'Argjend Report FB DS 2', alerts: 0, dateRange: 'Nov 4 – Dec 3, 2025' },
-  { id: 6, name: 'Argjend Report FB DS',  alerts: 0, dateRange: 'Oct 22 – Nov 20, 2025' },
-  { id: 7, name: 'Argjend Report FB DS',  alerts: 0, dateRange: 'Oct 10 – Nov 8, 2025' },
 ]

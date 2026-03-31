@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Sidebar from './components/Sidebar'
 import KPISummary from './components/KPISummary'
 import PerformanceTrend from './components/PerformanceTrend'
@@ -12,10 +12,17 @@ import CurrentView from './views/CurrentView'
 import DateRangePicker from './components/DateRangePicker'
 
 export default function App() {
-  const [tab, setTab]       = useState('daily')
-  const [period, setPeriod] = useState('30D')
+  const [tab, setTab]           = useState('daily')
+  const [period, setPeriod]     = useState('30D')
+  const [productTab, setProductTab] = useState('all')
+  const tableRef = useRef(null)
 
   function handleApply(periodKey) { setPeriod(periodKey) }
+
+  function handleInsightClick(tabKey) {
+    setProductTab(tabKey)
+    setTimeout(() => tableRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
@@ -89,7 +96,7 @@ export default function App() {
               <>
                 <KPISummary period={period} />
                 <PerformanceTrend period={period} />
-                <PerformanceInsights />
+                <PerformanceInsights onInsightClick={handleInsightClick} />
                 <hr className="divider" />
                 <ProductCatalogOverview />
                 <DayOfWeekChart />
@@ -97,7 +104,9 @@ export default function App() {
                 <ProductCoverage />
                 <hr className="divider" />
                 <TopMovers />
-                <ProductTable />
+                <div ref={tableRef}>
+                  <ProductTable activeTab={productTab} onTabChange={setProductTab} />
+                </div>
               </>
             ) : (
               <CurrentView />

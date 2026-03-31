@@ -32,8 +32,10 @@ function GadsIcon() {
   )
 }
 
-export default function ProductTable() {
-  const [activeTab, setActiveTab] = useState('all')
+export default function ProductTable({ activeTab: externalTab, onTabChange }) {
+  const [internalTab, setInternalTab] = useState('all')
+  const activeTab = externalTab ?? internalTab
+  function setActiveTab(t) { setInternalTab(t); onTabChange?.(t) }
   const [search, setSearch] = useState('')
 
   const ov = OVERVIEW[activeTab]
