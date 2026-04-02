@@ -50,14 +50,23 @@ function MoverTable({ movers, dir, onSelect }) {
   )
 }
 
+const PAGE = 5
+
 export default function TopMovers({ blurBody }) {
-  const [modalId,     setModalId]     = useState(null)
-  const [showUpgrade, setShowUpgrade] = useState(false)
+  const [modalId,      setModalId]      = useState(null)
+  const [showUpgrade,  setShowUpgrade]  = useState(false)
+  const [visibleCount, setVisibleCount] = useState(PAGE)
+
+  const gainers   = topMovers.gainers.slice(0, visibleCount)
+  const decliners = topMovers.decliners.slice(0, visibleCount)
+  const totalRows = Math.max(topMovers.gainers.length, topMovers.decliners.length)
+  const canExpand = visibleCount < totalRows
+  const canCollapse = visibleCount > PAGE
 
   return (
     <>
-      {modalId     && <ProductModal   productId={modalId} onClose={() => setModalId(null)} />}
-      {showUpgrade && <UpgradeModal   onClose={() => setShowUpgrade(false)} />}
+      {modalId     && <ProductModal  productId={modalId} onClose={() => setModalId(null)} />}
+      {showUpgrade && <UpgradeModal  onClose={() => setShowUpgrade(false)} />}
 
       <div className="card section-wrap" style={{ marginBottom: 28 }}>
 
@@ -83,7 +92,7 @@ export default function TopMovers({ blurBody }) {
                     <span style={{ fontSize: 13, fontWeight: 700, color: '#15803D' }}>↑ Getting better</span>
                     <span style={{ fontSize: 11, color: '#9CA3AF' }}>Mar 23–29 vs Mar 16–22</span>
                   </div>
-                  <MoverTable movers={topMovers.gainers} dir="up" onSelect={() => {}} />
+                  <MoverTable movers={topMovers.gainers.slice(0, PAGE)} dir="up" onSelect={() => {}} />
                 </div>
                 <div style={{ background: '#F3F4F6' }} />
                 <div>
@@ -91,7 +100,7 @@ export default function TopMovers({ blurBody }) {
                     <span style={{ fontSize: 13, fontWeight: 700, color: '#DC2626' }}>↓ Getting worse</span>
                     <span style={{ fontSize: 11, color: '#9CA3AF' }}>Mar 23–29 vs Mar 16–22</span>
                   </div>
-                  <MoverTable movers={topMovers.decliners} dir="down" onSelect={() => {}} />
+                  <MoverTable movers={topMovers.decliners.slice(0, PAGE)} dir="down" onSelect={() => {}} />
                 </div>
               </div>
             </div>
@@ -125,23 +134,58 @@ export default function TopMovers({ blurBody }) {
             </div>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1px 1fr', gap: '0 32px' }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#15803D' }}>↑ Getting better</span>
-                <span style={{ fontSize: 11, color: '#9CA3AF' }}>Mar 23–29 vs Mar 16–22</span>
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1px 1fr', gap: '0 32px' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#15803D' }}>↑ Getting better</span>
+                  <span style={{ fontSize: 11, color: '#9CA3AF' }}>Mar 23–29 vs Mar 16–22</span>
+                </div>
+                <MoverTable movers={gainers} dir="up" onSelect={setModalId} />
               </div>
-              <MoverTable movers={topMovers.gainers} dir="up" onSelect={setModalId} />
-            </div>
-            <div style={{ background: '#F3F4F6' }} />
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#DC2626' }}>↓ Getting worse</span>
-                <span style={{ fontSize: 11, color: '#9CA3AF' }}>Mar 23–29 vs Mar 16–22</span>
+              <div style={{ background: '#F3F4F6' }} />
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#DC2626' }}>↓ Getting worse</span>
+                  <span style={{ fontSize: 11, color: '#9CA3AF' }}>Mar 23–29 vs Mar 16–22</span>
+                </div>
+                <MoverTable movers={decliners} dir="down" onSelect={setModalId} />
               </div>
-              <MoverTable movers={topMovers.decliners} dir="down" onSelect={setModalId} />
             </div>
-          </div>
+
+            {/* Expand / collapse */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20, paddingTop: 16, borderTop: '1px solid #F3F4F6' }}>
+              {canExpand && (
+                <button
+                  onClick={() => setVisibleCount(v => Math.min(v + 10, totalRows))}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 18px', borderRadius: 8, border: '1.5px solid #E5E7EB', background: 'white', fontSize: 13, fontWeight: 600, color: '#374151', cursor: 'pointer', fontFamily: 'inherit' }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = '#6D28D9'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = '#E5E7EB'}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
+                  Show {Math.min(10, totalRows - visibleCount)} more
+                </button>
+              )}
+              {canCollapse && (
+                <button
+                  onClick={() => setVisibleCount(PAGE)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 18px', borderRadius: 8, border: '1.5px solid #E5E7EB', background: 'white', fontSize: 13, fontWeight: 600, color: '#9CA3AF', cursor: 'pointer', fontFamily: 'inherit' }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = '#D1D5DB'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = '#E5E7EB'}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="18 15 12 9 6 15"/>
+                  </svg>
+                  Show less
+                </button>
+              )}
+              <span style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: '#9CA3AF' }}>
+                {visibleCount} of {totalRows} products
+              </span>
+            </div>
+          </>
         )}
       </div>
     </>
