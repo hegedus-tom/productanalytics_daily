@@ -73,7 +73,7 @@ export default function TopMovers({ blurBody }) {
         {/* Header — always visible, never blurred */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <div>
-            <div className="card-title">Biggest ROAS movers</div>
+            <div className="card-title">Biggest revenue movers</div>
             <div className="card-subtitle">What changed in the past week — last 7 days vs previous 7 days</div>
           </div>
           <span style={{ fontSize: 11, background: '#EDE9FE', color: '#6D28D9', padding: '3px 8px', borderRadius: 20, fontWeight: 600 }}>
