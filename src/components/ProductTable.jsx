@@ -3,6 +3,7 @@ import { segments, getProductListForPeriod, getOverviewForPeriod } from '../data
 import FilterBar from './FilterBar'
 import ProductModal from './ProductModal'
 import SaveViewModal from './SaveViewModal'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 
 function fmt(n) { return '€' + n.toLocaleString('en-EU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
 function fmtPct(n) { return n.toFixed(2) + '%' }
@@ -57,6 +58,60 @@ const TAB_INFO = {
     title: 'What are "Active" products?',
     body: 'Really active products are those that the algorithms have tested (e.g., received more than 10 clicks) and are currently displayed in campaigns. Ideally, your entire portfolio should be promoted. If some products are missing, the algorithms have skipped them.',
   },
+}
+
+const ROAS_BUCKETS = [
+  { label: '<50%',     min: 0,   max: 50,       color: '#DC2626' },
+  { label: '50–100%',  min: 50,  max: 100,      color: '#F97316' },
+  { label: '100–150%', min: 100, max: 150,      color: '#F59E0B' },
+  { label: '150–200%', min: 150, max: 200,      color: '#A3E635' },
+  { label: '200–300%', min: 200, max: 300,      color: '#22C55E' },
+  { label: '300%+',    min: 300, max: Infinity, color: '#15803D' },
+]
+
+function buildBuckets(products) {
+  return ROAS_BUCKETS.map(b => ({
+    ...b,
+    count: products.filter(p => p.roas >= b.min && p.roas < b.max).length,
+  }))
+}
+
+function BucketTooltip({ active, payload }) {
+  if (!active || !payload?.length) return null
+  const d = payload[0].payload
+  return (
+    <div className="ct">
+      <div className="ct-date">{d.label}</div>
+      <div className="ct-row">
+        <span className="ct-label">Products</span>
+        <span className="ct-val">{d.count}</span>
+      </div>
+    </div>
+  )
+}
+
+function TabChart({ products }) {
+  const data = buildBuckets(products)
+  const hasData = data.some(d => d.count > 0)
+  if (!hasData) return null
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        ROAS distribution — products in this segment
+      </div>
+      <ResponsiveContainer width="100%" height={80}>
+        <BarChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }} barCategoryGap="20%">
+          <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
+          <YAxis hide />
+          <Tooltip content={<BucketTooltip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+          <Bar dataKey="count" radius={[3, 3, 0, 0]} maxBarSize={48}
+            label={{ position: 'top', fontSize: 10, fontWeight: 700, fill: '#374151', formatter: v => v > 0 ? v : '' }}>
+            {data.map((d, i) => <Cell key={i} fill={d.color} />)}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  )
 }
 
 // Column definitions: key = data field, string = locale-compare, number = numeric sort
@@ -231,43 +286,22 @@ export default function ProductTable({ activeTab: externalTab, onTabChange, onSa
         </div>
       )}
 
-      {/* Overview row */}
-      <div className="overview-row" style={{ marginBottom: 20, background: 'white' }}>
-        <div className="overview-stat">
-          <div className="overview-stat-label">Total products</div>
-          <div className="overview-stat-value">{ov.products.toLocaleString()}</div>
-          <div className="overview-stat-sub">
-            {activeTab === 'all' ? '100% of all products in the feed' :
-             activeTab === 'inactive' ? '0 spend in selected period' :
-             `${((ov.products / segments.total) * 100).toFixed(2)}% of all products`}
-          </div>
-        </div>
-        <div className="overview-stat">
-          <div className="overview-stat-label">Total spend</div>
-          <div className="overview-stat-value">{fmt(ov.spend)}</div>
-          <div className="overview-stat-sub">
-            {activeTab === 'all' ? '100% of total budget' :
-             activeTab === 'inactive' ? 'No spend' :
-             `${((ov.spend / 15395.20) * 100).toFixed(2)}% of total budget`}
-          </div>
-        </div>
-        <div className="overview-stat">
-          <div className="overview-stat-label">Total revenue</div>
-          <div className="overview-stat-value">{fmt(ov.revenue)}</div>
-          <div className="overview-stat-sub">
-            {activeTab === 'all' ? '100% of the total revenue' :
-             `${((ov.revenue / 32441.78) * 100).toFixed(2)}% of the total revenue`}
-          </div>
-        </div>
-        <div className="overview-stat">
-          <div className="overview-stat-label">Average ROAS</div>
-          <div className="overview-stat-value" style={{ color: ov.roas != null && ov.roas < 100 ? '#DC2626' : '#111827' }}>
-            {ov.roas != null ? fmtPct(ov.roas) : '—'}
-          </div>
-          <div className="overview-stat-sub">
-            {activeTab === 'all' ? '1x equal the average ROAS' :
-             ov.roas != null ? `${(ov.roas / 210.73).toFixed(2)}x the account average` : 'No revenue data'}
-          </div>
+      {/* Tab chart + compact stats */}
+      <div style={{ background: 'white', border: '1px solid #F3F4F6', borderRadius: 10, padding: '14px 18px', marginBottom: 16 }}>
+        <TabChart products={rawRows} />
+        <div style={{ display: 'flex', gap: 0, borderTop: rawRows.length ? '1px solid #F3F4F6' : 'none', paddingTop: rawRows.length ? 12 : 0, flexWrap: 'wrap' }}>
+          {[
+            { label: 'Products',     value: ov.products.toLocaleString(),   sub: activeTab === 'all' ? '100% of feed' : activeTab === 'inactive' ? 'no spend' : `${((ov.products / segments.total) * 100).toFixed(1)}% of feed` },
+            { label: 'Spend',        value: fmt(ov.spend),                  sub: activeTab === 'all' ? '100% of budget' : activeTab === 'inactive' ? 'no spend' : `${((ov.spend / 15395.20) * 100).toFixed(1)}% of budget` },
+            { label: 'Revenue',      value: fmt(ov.revenue),                sub: activeTab === 'all' ? '100% of revenue' : `${((ov.revenue / 32441.78) * 100).toFixed(1)}% of revenue` },
+            { label: 'Avg ROAS',     value: ov.roas != null ? fmtPct(ov.roas) : '—', sub: activeTab === 'all' ? 'account avg' : ov.roas != null ? `${(ov.roas / 210.73).toFixed(2)}x avg` : 'no data', roasVal: ov.roas },
+          ].map((s, i, arr) => (
+            <div key={s.label} style={{ flex: '1 1 120px', padding: '0 20px 0 0', borderRight: i < arr.length - 1 ? '1px solid #F3F4F6' : 'none', marginRight: i < arr.length - 1 ? 20 : 0 }}>
+              <div style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 3 }}>{s.label}</div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: s.roasVal != null && s.roasVal < 100 ? '#DC2626' : '#111827', lineHeight: 1.2 }}>{s.value}</div>
+              <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{s.sub}</div>
+            </div>
+          ))}
         </div>
       </div>
 
