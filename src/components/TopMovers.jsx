@@ -9,7 +9,7 @@ function MoverTable({ movers, dir, onSelect }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '0 16px', padding: '0 0 8px', borderBottom: '1px solid #F3F4F6', marginBottom: 4 }}>
         <span style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Product</span>
         <span style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Revenue / wk</span>
-        <span style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>ROAS Δ</span>
+        <span style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Revenue Δ</span>
       </div>
       {movers.map((m, i) => (
         <div key={m.id} style={{
@@ -34,14 +34,14 @@ function MoverTable({ movers, dir, onSelect }) {
             <div style={{ fontSize: 11, color: '#9CA3AF' }}>was €{m.revenuePrior.toFixed(0)}</div>
           </div>
 
-          {/* ROAS delta pill */}
+          {/* Revenue delta pill */}
           <div style={{ textAlign: 'right', minWidth: 72 }}>
             <span style={{
               display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 700,
               background: dir === 'up' ? '#DCFCE7' : '#FEE2E2',
               color:      dir === 'up' ? '#15803D'  : '#DC2626',
             }}>
-              {dir === 'up' ? '+' : ''}{m.delta.toFixed(0)}%
+              {dir === 'up' ? '+' : ''}€{Math.abs(m.revenueL7 - m.revenuePrior).toFixed(0)}
             </span>
           </div>
         </div>
