@@ -3,7 +3,6 @@ import Sidebar from './components/Sidebar'
 import KPISummary from './components/KPISummary'
 import PerformanceTrend from './components/PerformanceTrend'
 import PerformanceInsights from './components/PerformanceInsights'
-import DayOfWeekChart from './components/DayOfWeekChart'
 import ProductCoverage from './components/ProductCoverage'
 import TopMovers from './components/TopMovers'
 import ProductTable from './components/ProductTable'
@@ -21,14 +20,13 @@ const TABS = [
 function DailyContent({ period, periodInfo, onInsightClick, tableRef, productTab, setProductTab, onSaveView, activeViewFilters, limited }) {
   return (
     <>
-      <KPISummary period={period} />
-      <PerformanceInsights onInsightClick={onInsightClick} />
       <PerformanceTrend period={period} />
+      <PerformanceInsights onInsightClick={onInsightClick} />
+      <KPISummary period={period} />
       <hr className="divider" />
       <ProductCoverage />
       <hr className="divider" />
       {limited ? <TopMovers blurBody /> : <TopMovers />}
-      {limited ? <DayOfWeekChart blurBody /> : <DayOfWeekChart />}
       <div ref={tableRef}>
         <ProductTable
           activeTab={productTab}
