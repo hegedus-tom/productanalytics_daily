@@ -131,7 +131,7 @@ export default function PerformanceTrend({ period }) {
           <span>⚠</span>
           <span>
             <b>Low ROAS detected</b> on {anomalyDays.map(d => d.dateShort).join(', ')}.
-            Spend was active but returns were below break-even. Review product segments below.
+            Spend was active but returns were below target ROAS. Review product segments below.
           </span>
         </div>
       )}
@@ -170,7 +170,7 @@ export default function PerformanceTrend({ period }) {
           {/* Reference lines */}
           <ReferenceLine yAxisId="right" y={100}
             stroke="#FCA5A5" strokeDasharray="5 4" strokeWidth={1.5}
-            label={{ value: 'Break-even', position: 'right', fill: '#EF4444', fontSize: 10 }} />
+            label={{ value: 'Target ROAS', position: 'right', fill: '#EF4444', fontSize: 10 }} />
           <ReferenceLine yAxisId="right" y={AVG_ROAS}
             stroke="#C4B5FD" strokeDasharray="5 4" strokeWidth={1.5}
             label={{ value: 'Avg ROAS', position: 'right', fill: '#7C3AED', fontSize: 10 }} />
@@ -239,7 +239,7 @@ export default function PerformanceTrend({ period }) {
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <span style={{ width: 28, height: 2, background: '#FCA5A5', display: 'inline-block' }} />
-          Break-even (100%)
+          Target ROAS (100%)
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <span style={{ width: 28, height: 2, background: '#C4B5FD', display: 'inline-block' }} />

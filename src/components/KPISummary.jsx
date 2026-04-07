@@ -1,4 +1,4 @@
-import { dailyStats } from '../data/mockData'
+import { dailyStats, segments } from '../data/mockData'
 
 function fmt(n) { return '€' + n.toLocaleString('en-EU', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }
 function fmtPct(n) { return n.toFixed(1) + '%' }
@@ -60,7 +60,7 @@ export default function KPISummary({ period }) {
     {
       label: 'Active Products',
       value: active.toLocaleString(),
-      sub: `avg products with spend/day`,
+      sub: `${(active / segments.total * 100).toFixed(1)}% of ${segments.total.toLocaleString()} total products`,
       delta: activeDelta,
       goodUp: true,
     },
