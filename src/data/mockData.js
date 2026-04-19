@@ -81,6 +81,7 @@ export const topMovers = {
     { id: '245678_s',   name: 'Mizuno Wave Rider 27 White/ Silver EUR 36',                roasCurrent: 223.7, roasPrior: 180.9, delta:  42.8, spendL7: 10.8,  revenueL7:  24.2, revenuePrior:  19.5 },
     { id: '367890_40',  name: 'Inov-8 Trailfly G 270 V2 Pine/ Lilac EUR 40',              roasCurrent: 211.4, roasPrior: 173.1, delta:  38.3, spendL7:  9.6,  revenueL7:  20.3, revenuePrior:  16.6 },
     { id: '489012_xl',  name: 'Merrell Moab Speed 2 GTX Olive/ Gum EUR 42',               roasCurrent: 199.8, roasPrior: 165.7, delta:  34.1, spendL7:  8.3,  revenueL7:  16.6, revenuePrior:  13.7 },
+    { id: '567234_39',  name: 'Hoka Speedgoat 5 Black/ White EUR 39',                      roasCurrent: 189.2, roasPrior: 158.3, delta:  30.9, spendL7:  7.1,  revenueL7:  13.4, revenuePrior:  11.2 },
   ],
   decliners: [
     { id: '234789_l',   name: 'Vans Old Skool Classic Marshmallow EUR 36',                 roasCurrent:  79.3, roasPrior: 312.8, delta: -233.5, spendL7: 87.5, revenueL7:  69.4, revenuePrior: 273.7 },
