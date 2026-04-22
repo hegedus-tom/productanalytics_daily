@@ -136,12 +136,8 @@ function SegmentCharts({ ov, activeTab }) {
       <div style={{ background: 'white', border: '1px solid #F3F4F6', borderRadius: 10, padding: '14px 16px' }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Products</div>
         <div style={{ fontSize: 22, fontWeight: 800, color: '#111827', lineHeight: 1 }}>{ov.products.toLocaleString()}</div>
-        <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 10, marginTop: 3 }}>
+        <div style={{ fontSize: 11, color: '#6B7280', marginTop: 3 }}>
           {isAll ? '100% of feed' : `${prodPct.toFixed(1)}% of ${TOTAL_PRODUCTS.toLocaleString()} total`}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <SlimBar value={prodPct} max={100} color="#6D28D9" height={5} />
-          <span style={{ fontSize: 10, color: '#9CA3AF', flexShrink: 0 }}>{prodPct.toFixed(1)}%</span>
         </div>
       </div>
 
@@ -149,12 +145,8 @@ function SegmentCharts({ ov, activeTab }) {
       <div style={{ background: 'white', border: '1px solid #F3F4F6', borderRadius: 10, padding: '14px 16px' }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Spend</div>
         <div style={{ fontSize: 22, fontWeight: 800, color: '#111827', lineHeight: 1 }}>{isInactive ? '€0' : fmt(ov.spend)}</div>
-        <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 10, marginTop: 3 }}>
+        <div style={{ fontSize: 11, color: '#6B7280', marginTop: 3 }}>
           {isInactive ? 'No spend in period' : isAll ? '100% of total budget' : `${spendPct.toFixed(1)}% of total budget`}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <SlimBar value={spendPct} max={100} color="#7C3AED" height={5} />
-          <span style={{ fontSize: 10, color: '#9CA3AF', flexShrink: 0 }}>{spendPct.toFixed(1)}%</span>
         </div>
       </div>
 
@@ -162,43 +154,19 @@ function SegmentCharts({ ov, activeTab }) {
       <div style={{ background: 'white', border: '1px solid #F3F4F6', borderRadius: 10, padding: '14px 16px' }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Revenue</div>
         <div style={{ fontSize: 22, fontWeight: 800, color: '#111827', lineHeight: 1 }}>{fmt(ov.revenue)}</div>
-        <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 10, marginTop: 3 }}>
+        <div style={{ fontSize: 11, color: '#6B7280', marginTop: 3 }}>
           {isAll ? '100% of total revenue' : `${revPct.toFixed(1)}% of total revenue`}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <SlimBar value={revPct} max={100} color="#0EA5E9" height={5} />
-          <span style={{ fontSize: 10, color: '#9CA3AF', flexShrink: 0 }}>{revPct.toFixed(1)}%</span>
         </div>
       </div>
 
-      {/* ROAS with mini bar chart */}
+      {/* ROAS */}
       <div style={{ background: 'white', border: '1px solid #F3F4F6', borderRadius: 10, padding: '14px 16px' }}>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Avg ROAS</div>
         <div style={{ fontSize: 22, fontWeight: 800, color: roasColor, lineHeight: 1 }}>
           {ov.roas != null ? fmtPct(ov.roas) : '—'}
         </div>
-        <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 6, marginTop: 3 }}>
+        <div style={{ fontSize: 11, color: '#6B7280', marginTop: 3 }}>
           {roasRatio != null ? `${roasRatio.toFixed(2)}× account avg` : 'No revenue data'}
-        </div>
-        <ResponsiveContainer width="100%" height={36}>
-          <BarChart data={barData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} barSize={18}>
-            <Bar dataKey="value" radius={[3, 3, 0, 0]}>
-              {barData.map((d, i) => <Cell key={i} fill={d.fill} />)}
-            </Bar>
-            <Tooltip
-              formatter={(v, name, props) => [`€${v.toFixed(0)}`, props.payload.label]}
-              contentStyle={{ fontSize: 11, padding: '4px 8px', border: '1px solid #E5E7EB', borderRadius: 6 }}
-              cursor={{ fill: 'rgba(0,0,0,0.04)' }}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-        <div style={{ display: 'flex', gap: 10, marginTop: 3 }}>
-          {barData.map(d => (
-            <span key={d.label} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: '#9CA3AF' }}>
-              <span style={{ width: 8, height: 8, borderRadius: 2, background: d.fill, display: 'inline-block' }} />
-              {d.label}
-            </span>
-          ))}
         </div>
       </div>
 
