@@ -54,10 +54,6 @@ function CustomTooltip({ active, payload }) {
           <span className="ct-val" style={{ color: '#7C3AED' }}>{roasAvgEntry.value.toFixed(1)}%</span>
         </div>
       )}
-      <div className="ct-row">
-        <span className="ct-label">Clicks</span>
-        <span className="ct-val">{d.clicks?.toLocaleString()}</span>
-      </div>
       {d.anomaly === 'low'     && <div className="ct-anomaly">⚠ ROAS below normal — check product segments</div>}
       {d.anomaly === 'high'    && <div className="ct-anomaly" style={{ color: '#15803D' }}>★ Unusually strong ROAS day</div>}
       {d.anomaly === 'partial' && <div className="ct-anomaly" style={{ color: '#92400E' }}>⏳ Partial day — data still syncing</div>}
@@ -66,8 +62,7 @@ function CustomTooltip({ active, payload }) {
 }
 
 const OVERLAYS = [
-  { key: 'revenue', label: 'Revenue',   color: '#0EA5E9' },
-  { key: 'clicks',  label: 'Clicks',    color: '#F59E0B' },
+  { key: 'revenue', label: 'Revenue', color: '#0EA5E9' },
 ]
 
 export default function PerformanceTrend({ period }) {
@@ -88,7 +83,6 @@ export default function PerformanceTrend({ period }) {
 
   const anomalyDays = data.filter(d => d.anomaly === 'low')
   const showRevenue = active.has('revenue')
-  const showClicks  = active.has('clicks')
 
   return (
     <div className="card section-wrap" style={{ marginBottom: 28 }}>
@@ -101,9 +95,6 @@ export default function PerformanceTrend({ period }) {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          <span style={{ fontSize: 11, background: '#EDE9FE', color: '#6D28D9', padding: '3px 8px', borderRadius: 20, fontWeight: 600 }}>
-            New with daily data
-          </span>
           <span style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 500 }}>Overlay:</span>
           {OVERLAYS.map(o => (
             <button
@@ -136,7 +127,7 @@ export default function PerformanceTrend({ period }) {
         </div>
       )}
 
-      <HowToRead text="Spend bars show daily budget. The purple line is daily ROAS — the dashed line smooths it to a 7-day average so you can separate real trends from daily noise. Red/green dots flag outlier days. Toggle Revenue or Clicks to see how they move together with ROAS." />
+      <HowToRead text="Spend bars show daily budget. The purple line is daily ROAS — the dashed line smooths it to a 7-day average so you can separate real trends from daily noise. Red/green dots flag outlier days. Toggle Revenue to see how it moves together with ROAS." />
 
       <ResponsiveContainer width="100%" height={300}>
         <ComposedChart data={data} margin={{ top: 10, right: 60, left: 10, bottom: 0 }}>
@@ -155,11 +146,11 @@ export default function PerformanceTrend({ period }) {
             axisLine={false} tickLine={false}
             width={55}
           />
-          {/* Right Y: ROAS % + clicks */}
+          {/* Right Y: ROAS % */}
           <YAxis
             yAxisId="right"
             orientation="right"
-            tickFormatter={v => showClicks && !showRevenue ? v.toLocaleString() : `${v}%`}
+            tickFormatter={v => `${v}%`}
             tick={{ fontSize: 11, fill: '#9CA3AF' }}
             axisLine={false} tickLine={false}
             width={50}
@@ -182,12 +173,6 @@ export default function PerformanceTrend({ period }) {
           {showRevenue && (
             <Line yAxisId="left" type="monotone" dataKey="revenue"
               stroke="#0EA5E9" strokeWidth={2} dot={false} activeDot={{ r: 4 }} name="Revenue (€)" />
-          )}
-
-          {/* Clicks overlay */}
-          {showClicks && (
-            <Line yAxisId="right" type="monotone" dataKey="clicks"
-              stroke="#F59E0B" strokeWidth={2} dot={false} activeDot={{ r: 4 }} name="Clicks" />
           )}
 
           {/* ROAS line — always */}
@@ -221,12 +206,6 @@ export default function PerformanceTrend({ period }) {
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <span style={{ width: 28, height: 2, background: '#0EA5E9', display: 'inline-block', borderRadius: 2 }} />
             Revenue
-          </span>
-        )}
-        {showClicks && (
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ width: 28, height: 2, background: '#F59E0B', display: 'inline-block', borderRadius: 2 }} />
-            Clicks
           </span>
         )}
         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

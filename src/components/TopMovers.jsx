@@ -76,9 +76,6 @@ export default function TopMovers({ blurBody }) {
             <div className="card-title">Biggest revenue movers</div>
             <div className="card-subtitle">What changed in the past week — last 7 days vs previous 7 days</div>
           </div>
-          <span style={{ fontSize: 11, background: '#EDE9FE', color: '#6D28D9', padding: '3px 8px', borderRadius: 20, fontWeight: 600 }}>
-            New with daily data
-          </span>
         </div>
 
         {/* Body — blurred with upgrade overlay when blurBody */}

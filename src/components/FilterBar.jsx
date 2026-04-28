@@ -39,7 +39,7 @@ export default function FilterBar({ filters, onChange, onSaveView }) {
   const activeKeys = new Set(filters.map(f => f.key))
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
 
       {/* Filters button */}
       <div ref={ref} style={{ position: 'relative' }}>
@@ -47,7 +47,7 @@ export default function FilterBar({ filters, onChange, onSaveView }) {
           onClick={() => { setOpen(o => !o); setSubmenu(null) }}
           style={{
             display: 'flex', alignItems: 'center', gap: 6,
-            padding: '6px 12px', border: '1px solid #E5E7EB', borderRadius: 7,
+            padding: '4px 10px', border: '1px solid #E5E7EB', borderRadius: 7,
             background: 'white', cursor: 'pointer', fontSize: 13, fontWeight: 500,
             color: '#374151', fontFamily: 'inherit',
             boxShadow: open ? '0 0 0 3px rgba(109,40,217,0.08)' : 'none',
@@ -124,10 +124,10 @@ export default function FilterBar({ filters, onChange, onSaveView }) {
           border: '1px solid #E5E7EB', borderRadius: 7, background: 'white',
           fontSize: 13, overflow: 'hidden',
         }}>
-          <span style={{ padding: '5px 10px', fontWeight: 600, color: '#374151', borderRight: '1px solid #E5E7EB' }}>
+          <span style={{ padding: '3px 8px', fontWeight: 600, color: '#374151', borderRight: '1px solid #E5E7EB' }}>
             {f.label}
           </span>
-          <span style={{ padding: '5px 8px', color: '#9CA3AF', borderRight: '1px solid #E5E7EB' }}>
+          <span style={{ padding: '3px 7px', color: '#9CA3AF', borderRight: '1px solid #E5E7EB' }}>
             {OP_LABEL[f.op]}
           </span>
           <input
@@ -135,14 +135,14 @@ export default function FilterBar({ filters, onChange, onSaveView }) {
             value={f.value}
             onChange={e => updateValue(f.key, +e.target.value)}
             style={{
-              width: 52, padding: '5px 8px', border: 'none', outline: 'none',
+              width: 52, padding: '3px 7px', border: 'none', outline: 'none',
               fontSize: 13, fontWeight: 700, color: '#111827', fontFamily: 'inherit',
               background: 'transparent',
             }}
           />
           <button
             onClick={() => removeFilter(f.key)}
-            style={{ padding: '5px 8px', border: 'none', background: 'none', cursor: 'pointer', color: '#9CA3AF', fontSize: 14, lineHeight: 1 }}
+            style={{ padding: '3px 7px', border: 'none', background: 'none', cursor: 'pointer', color: '#9CA3AF', fontSize: 14, lineHeight: 1 }}
           >×</button>
         </div>
       ))}
@@ -154,7 +154,7 @@ export default function FilterBar({ filters, onChange, onSaveView }) {
             onClick={onSaveView}
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
-              padding: '6px 13px', border: '1px solid #C4B5FD', borderRadius: 7,
+              padding: '4px 10px', border: '1px solid #C4B5FD', borderRadius: 7,
               background: '#EDE9FE', cursor: 'pointer',
               fontSize: 13, fontWeight: 600, color: '#6D28D9', fontFamily: 'inherit',
             }}
@@ -164,7 +164,7 @@ export default function FilterBar({ filters, onChange, onSaveView }) {
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
               <circle cx="12" cy="12" r="3"/>
             </svg>
-            Save view
+            Save as new view
           </button>
           <button
             onClick={() => onChange([])}

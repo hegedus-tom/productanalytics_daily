@@ -82,9 +82,6 @@ export default function DayOfWeekChart({ blurBody }) {
             <div className="card-title">Best days to advertise</div>
             <div className="card-subtitle">Average ROAS by day of week — where your budget works hardest</div>
           </div>
-          <span style={{ fontSize: 11, background: '#EDE9FE', color: '#6D28D9', padding: '3px 8px', borderRadius: 20, fontWeight: 600 }}>
-            New with daily data
-          </span>
         </div>
 
         {/* Body */}

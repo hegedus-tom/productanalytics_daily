@@ -1,21 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts'
 import { segments, getProductListForPeriod, getOverviewForPeriod } from '../data/mockData'
-import FilterBar from './FilterBar'
 import ProductModal from './ProductModal'
-import SaveViewModal from './SaveViewModal'
 
 function fmt(n) { return '€' + n.toLocaleString('en-EU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
 function fmtPct(n) { return n.toFixed(2) + '%' }
-
-const TABS = [
-  { key: 'all',            label: 'All products',    count: segments.total,           alert: false },
-  { key: 'losers',         label: 'Losers',           count: segments.losers,          alert: true  },
-  { key: 'underperformers',label: 'Underperformers',  count: segments.underperformers, alert: true  },
-  { key: 'budgetSpenders', label: 'Budget spenders',  count: segments.budgetSpenders,  alert: true  },
-  { key: 'active',         label: 'Active products',  count: segments.active,          alert: true  },
-  { key: 'inactive',       label: 'Inactive products',count: segments.inactive,        alert: false },
-]
 
 
 const TAB_ALERT = {
@@ -41,7 +30,7 @@ const TAB_ALERT = {
   },
 }
 
-const TAB_INFO = {
+export const TAB_INFO = {
   losers: {
     title: 'What are "Loser" products?',
     body: 'Losers are products that generate less revenue than the amount spent on advertising. This means they don\'t even cover their ad costs. These products should be considered for exclusion or their budgets should be significantly reduced.',
@@ -174,25 +163,15 @@ function SegmentCharts({ ov, activeTab }) {
   )
 }
 
-export default function ProductTable({ activeTab: externalTab, onTabChange, onSaveView, externalFilters, period = '30D', periodInfo }) {
+export default function ProductTable({ activeTab: externalTab, onTabChange, filters = [], setFilters, period = '30D', periodInfo }) {
   const [internalTab, setInternalTab] = useState('all')
   const activeTab = externalTab ?? internalTab
   function setActiveTab(t) { setInternalTab(t); onTabChange?.(t) }
 
-  const [search,       setSearch]       = useState('')
-  const [filters,      setFilters]      = useState([])
-  const [sortCol,      setSortCol]      = useState(null)
-  const [sortDir,      setSortDir]      = useState('asc')
-  const [modalId,      setModalId]      = useState(null)
-  const [saveViewOpen, setSaveViewOpen] = useState(false)
-
-  // apply externally triggered filters (from saved view click in sidebar)
-  // externalFilters is wrapped as { filters, ts } in App so re-clicking the same view always fires
-  useEffect(() => {
-    if (externalFilters?.filters) {
-      setFilters(externalFilters.filters)
-    }
-  }, [externalFilters])
+  const [search,  setSearch]  = useState('')
+  const [sortCol, setSortCol] = useState(null)
+  const [sortDir, setSortDir] = useState('asc')
+  const [modalId, setModalId] = useState(null)
 
   function handleSort(colKey) {
     if (sortCol === colKey) {
@@ -234,48 +213,6 @@ export default function ProductTable({ activeTab: externalTab, onTabChange, onSa
     <div className="section-wrap" style={{ marginBottom: 28 }}>
       <div className="section-title">Product intelligence</div>
       <div className="section-subtitle">A complete analysis of your product portfolio, organized into key product segments.</div>
-
-      {saveViewOpen && (
-        <SaveViewModal
-          filters={filters}
-          periodInfo={periodInfo}
-          onSave={(name, f) => onSaveView?.(name, f)}
-          onClose={() => setSaveViewOpen(false)}
-        />
-      )}
-      <FilterBar filters={filters} onChange={setFilters} onSaveView={() => setSaveViewOpen(true)} />
-
-      <div className="tabs">
-        {TABS.map(t => (
-          <div
-            key={t.key}
-            className={`tab ${activeTab === t.key ? 'active' : ''}`}
-            onClick={() => { setActiveTab(t.key); setSearch('') }}
-          >
-            {t.label}
-            <span className={`tab-badge ${t.alert && activeTab !== t.key ? 'alert' : ''}`}>
-              {t.alert && activeTab !== t.key && <span style={{ marginRight: 2 }}>⚠</span>}
-              {t.count.toLocaleString()}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {/* Tab info box */}
-      {TAB_INFO[activeTab] && (
-        <div style={{
-          background: '#F5F3FF', border: '1px solid #DDD6FE', borderRadius: 10,
-          padding: '14px 18px', marginBottom: 12,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-            <span style={{ fontSize: 14 }}>💬</span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: '#6D28D9' }}>{TAB_INFO[activeTab].title}</span>
-          </div>
-          <p style={{ fontSize: 13, color: '#4C1D95', lineHeight: 1.65, margin: 0 }}>
-            {TAB_INFO[activeTab].body}
-          </p>
-        </div>
-      )}
 
       {/* Key alert box */}
       {TAB_ALERT[activeTab] && (
